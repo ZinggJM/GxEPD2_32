@@ -71,11 +71,6 @@ void GxEPD2_32_BW::drawPixel(int16_t x, int16_t y, uint16_t color)
     _buffer[i] = (_buffer[i] & (0xFF ^ (1 << (7 - x % 8))));
 }
 
-GxEPD2_32_BW::GxEPD_Panel GxEPD2_32_BW::panel()
-{
-  return _panel;
-}
-
 void GxEPD2_32_BW::init()
 {
   //  Serial.print(WIDTH); Serial.print("x"); Serial.print(HEIGHT);
@@ -113,7 +108,7 @@ void GxEPD2_32_BW::init()
   SPISettings settings(4000000, MSBFIRST, SPI_MODE0);
   SPI.beginTransaction(settings);
   SPI.endTransaction();
-  Serial.println("SPI has Transaction");
+  //Serial.println("SPI has Transaction");
 #elif defined(ESP8266) || defined(ESP32)
   SPI.setFrequency(4000000);
 #endif
