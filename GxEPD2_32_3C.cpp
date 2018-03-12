@@ -25,10 +25,10 @@ const uint8_t GxEPD2_32_3C::bw2grey[] =
   0b11110000, 0b11110011, 0b11111100, 0b11111111,
 };
 
-GxEPD2_32_3C::GxEPD2_32_3C(GxEPD_Panel panel, int8_t cs, int8_t dc, int8_t rst, int8_t busy) :
-  Adafruit_GFX(GxEPD2_32_3C_ScreenDimensions[panel].width, GxEPD2_32_3C_ScreenDimensions[panel].height),
+GxEPD2_32_3C::GxEPD2_32_3C(GxEPD2::Panel panel, int8_t cs, int8_t dc, int8_t rst, int8_t busy) :
+  Adafruit_GFX(GxEPD2::ScreenDimensions[panel].width, GxEPD2::ScreenDimensions[panel].height),
   _panel(panel), _cs(cs), _dc(dc), _rst(rst), _busy(busy),
-  _current_page(-1), _using_partial_mode(false)
+  _current_page(-1), _using_partial_mode(false), _mirror(false)
 {
   _initial = true;
   _power_is_on = false;
@@ -42,7 +42,7 @@ GxEPD2_32_3C::GxEPD2_32_3C(GxEPD_Panel panel, int8_t cs, int8_t dc, int8_t rst, 
 void GxEPD2_32_3C::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
   if ((x < 0) || (x >= width()) || (y < 0) || (y >= height())) return;
-
+  if (_mirror) x = width() - x - 1;
   // check rotation, move pixel around if necessary
   switch (getRotation())
   {
@@ -76,6 +76,12 @@ void GxEPD2_32_3C::drawPixel(int16_t x, int16_t y, uint16_t color)
   if (color == GxEPD_WHITE) return;
   else if (color == GxEPD_BLACK) _black_buffer[i] = (_black_buffer[i] | (1 << (7 - x % 8)));
   else if (color == GxEPD_RED) _red_buffer[i] = (_red_buffer[i] | (1 << (7 - x % 8)));
+}
+
+bool GxEPD2_32_3C::mirror(bool m)
+{
+  swap (_mirror, m);
+  return m;
 }
 
 void GxEPD2_32_3C::init()
@@ -146,7 +152,7 @@ void GxEPD2_32_3C::setFullWindow()
 
 void GxEPD2_32_3C::setPartialWindow(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
 {
-  if (_panel != GDEW0154Z04)
+  if (_panel != GxEPD2::GDEW0154Z04)
   {
     _rotate(x, y, w, h);
     _using_partial_mode = true;
@@ -176,15 +182,15 @@ void GxEPD2_32_3C::firstPage()
     {
       switch (_panel)
       {
-        case GDEW0213Z16:
-        case GDEW029Z10:
-        case GDEW042Z15:
+        case GxEPD2::GDEW0213Z16:
+        case GxEPD2::GDEW029Z10:
+        case GxEPD2::GDEW042Z15:
           _Init_Part();
           _writeCommand(0x91); // partial in
           _setPartialRamArea(_pw_x, _pw_y, _pw_w, _pw_h);
           _writeCommand(0x10);
           break;
-        case GDEW027C44:
+        case GxEPD2::GDEW027C44:
           _Init_Part();
           _setPartialRamArea27(0x14, _pw_x, _pw_y, _pw_w, _pw_h);
           break;
@@ -199,13 +205,13 @@ bool GxEPD2_32_3C::nextPage()
   {
     switch (_panel)
     {
-      case GDEW0154Z04:
+      case GxEPD2::GDEW0154Z04:
         return _nextPageFull154();
-      case GDEW0213Z16:
-      case GDEW029Z10:
-      case GDEW042Z15:
+      case GxEPD2::GDEW0213Z16:
+      case GxEPD2::GDEW029Z10:
+      case GxEPD2::GDEW042Z15:
         return _nextPageFull();
-      case GDEW027C44:
+      case GxEPD2::GDEW027C44:
         return _nextPageFull27();
     }
   }
@@ -213,11 +219,11 @@ bool GxEPD2_32_3C::nextPage()
   {
     switch (_panel)
     {
-      case GDEW0213Z16:
-      case GDEW029Z10:
-      case GDEW042Z15:
+      case GxEPD2::GDEW0213Z16:
+      case GxEPD2::GDEW029Z10:
+      case GxEPD2::GDEW042Z15:
         return _nextPagePart();
-      case GDEW027C44:
+      case GxEPD2::GDEW027C44:
         return _nextPagePart27();
     }
   }
@@ -227,6 +233,32 @@ bool GxEPD2_32_3C::nextPage()
 void GxEPD2_32_3C::powerOff(void)
 {
   _PowerOff();
+}
+
+void GxEPD2_32_3C::drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color)
+{
+  // taken from Adafruit_GFX.cpp, modified
+  int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+  uint8_t byte = 0;
+  for (int16_t j = 0; j < h; j++)
+  {
+    for (int16_t i = 0; i < w; i++ )
+    {
+      if (i & 7) byte <<= 1;
+      else
+      {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+        byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
+#else
+        byte = bitmap[j * byteWidth + i / 8];
+#endif
+      }
+      if (!(byte & 0x80))
+      {
+        drawPixel(x + i, y + j, color);
+      }
+    }
+  }
 }
 
 bool GxEPD2_32_3C::_nextPageFull()
@@ -305,7 +337,7 @@ bool GxEPD2_32_3C::_nextPagePart()
     return true;
   }
 #ifdef USE_PARTIAL_UPDATE_WORKAROUND_ON_GDEW042Z15
-  if (_panel == GDEW042Z15)
+  if (_panel == GxEPD2::GDEW042Z15)
   {
     _setPartialRamArea(0, 0, WIDTH, HEIGHT);
   }
@@ -522,8 +554,8 @@ void GxEPD2_32_3C::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16
   uint16_t ye = y + h - 1;
   switch (_panel)
   {
-    case GDEW0213Z16:
-    case GDEW029Z10:
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
       x &= 0xFFF8; // byte boundary
       _writeCommand(0x90); // partial window
       //_writeData(x / 256);
@@ -537,7 +569,7 @@ void GxEPD2_32_3C::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16
       _writeData(0x01); // don't see any difference
       //_writeData(0x00); // don't see any difference
       break;
-    case GDEW042Z15:
+    case GxEPD2::GDEW042Z15:
       x &= 0xFFF8; // byte boundary
       xe |= 0x0007; // byte boundary
       _writeCommand(0x90); // partial window
@@ -598,7 +630,7 @@ void GxEPD2_32_3C::_PowerOff(void)
 {
   switch (_panel)
   {
-    case GDEW0154Z04:
+    case GxEPD2::GDEW0154Z04:
       return;
       _writeCommand(0X50);
       _writeData(0x17);    //BD floating
@@ -629,7 +661,7 @@ void GxEPD2_32_3C::_InitDisplay()
   }
   switch (_panel)
   {
-    case GDEW0154Z04:
+    case GxEPD2::GDEW0154Z04:
       _writeCommand(0x01);
       _writeData(0x07);
       _writeData(0x00);
@@ -655,7 +687,7 @@ void GxEPD2_32_3C::_InitDisplay()
       _writeCommand(0x82);
       _writeData(0x0E);
       break;
-    case GDEW0213Z16:
+    case GxEPD2::GDEW0213Z16:
       _writeCommand(0x06);
       _writeData (0x17);
       _writeData (0x17);
@@ -671,7 +703,7 @@ void GxEPD2_32_3C::_InitDisplay()
       _writeData (0x00);
       _writeData (0xd4);   //gate 212
       break;
-    case GDEW029Z10:
+    case GxEPD2::GDEW029Z10:
       _writeCommand(0x06);
       _writeData (0x17);
       _writeData (0x17);
@@ -687,7 +719,7 @@ void GxEPD2_32_3C::_InitDisplay()
       _writeData (0x01);
       _writeData (0x28);
       break;
-    case GDEW027C44:
+    case GxEPD2::GDEW027C44:
       _writeCommand(0x01);
       _writeData (0x03);
       _writeData (0x00);
@@ -731,7 +763,7 @@ void GxEPD2_32_3C::_InitDisplay()
       _writeCommand(0X50);
       _writeData(0x87);
       break;
-    case GDEW042Z15:
+    case GxEPD2::GDEW042Z15:
       _writeCommand(0x06); //boost
       _writeData(0x17);
       _writeData(0x17);
@@ -749,7 +781,7 @@ void GxEPD2_32_3C::_Init_Full()
   _InitDisplay();
   switch (_panel)
   {
-    case GDEW0154Z04:
+    case GxEPD2::GDEW0154Z04:
       _writeCommand(0x20);
       _writeData(GxGDEW0154Z04_lut_20_vcom0, sizeof(GxGDEW0154Z04_lut_20_vcom0));
       _writeCommand(0x21);
@@ -767,7 +799,7 @@ void GxEPD2_32_3C::_Init_Full()
       _writeCommand(0x27);
       _writeData(GxGDEW0154Z04_lut_27_red1, sizeof(GxGDEW0154Z04_lut_27_red1));
       break;
-    case GDEW027C44:
+    case GxEPD2::GDEW027C44:
       _writeCommand(0x20); //vcom
       _writeData_nCS(GxGDEW027C44_lut_20_vcomDC, sizeof(GxGDEW027C44_lut_20_vcomDC));
       _writeCommand(0x21); //ww --
@@ -788,7 +820,7 @@ void GxEPD2_32_3C::_Init_Part()
   _InitDisplay();
   switch (_panel)
   {
-    case GDEW027C44:
+    case GxEPD2::GDEW027C44:
       _writeCommand(0x20); //vcom
       _writeData_nCS(GxGDEW027C44_lut_20_vcomDC, sizeof(GxGDEW027C44_lut_20_vcomDC));
       _writeCommand(0x21); //ww --

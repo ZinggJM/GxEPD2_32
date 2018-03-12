@@ -12,33 +12,7 @@
 #ifndef _GxEPD2_32_3C_H_
 #define _GxEPD2_32_3C_H_
 
-#include <Arduino.h>
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-
-#ifndef GxEPD_BLACK
-#define GxEPD_BLACK     0x0000
-#define GxEPD_DARKGREY  0x7BEF      /* 128, 128, 128 */
-#define GxEPD_LIGHTGREY 0xC618      /* 192, 192, 192 */
-#define GxEPD_WHITE     0xFFFF
-#define GxEPD_RED       0xF800      /* 255,   0,   0 */
-#endif
-
-struct GxEPD2_32_3C_ScreenDimensionType
-{
-  uint16_t width;
-  uint16_t height;
-};
-
-static const GxEPD2_32_3C_ScreenDimensionType GxEPD2_32_3C_ScreenDimensions[]
-{
-  // note: width must be multiple of 8
-  {200, 200}, // GDEW0154Z04
-  {104, 212}, // GDEW0213Z16
-  {128, 296}, // GDEW029Z10
-  {176, 264}, // GDEW027C44
-  {400, 300}  // GDEW042Z15
-};
+#include "GxEPD2.h"
 
 class GxEPD2_32_3C : public Adafruit_GFX
 {
@@ -48,17 +22,9 @@ class GxEPD2_32_3C : public Adafruit_GFX
     // 2 * ~2.5k half screen buffer for GDEW042Z15 is a good compromise
     // static const uint16_t buffer_size = 400 * 300 / 8 / 2; // 2 * 2'500 bytes
   public:
-    enum GxEPD_Panel
-    {
-      GDEW0154Z04, Waveshare_1_54_bwr = GDEW0154Z04,
-      GDEW0213Z16, Waveshare_2_13_bwr = GDEW0213Z16,
-      GDEW029Z10,  Waveshare_2_9_bwr = GDEW029Z10,
-      GDEW027C44,  Waveshare_2_7_bwr = GDEW027C44,
-      GDEW042Z15,  Waveshare_4_2_bwr = GDEW042Z15
-    };
-    GxEPD2_32_3C(GxEPD_Panel panel, int8_t cs, int8_t dc, int8_t rst, int8_t busy);
+    GxEPD2_32_3C(GxEPD2::Panel panel, int8_t cs, int8_t dc, int8_t rst, int8_t busy);
     void drawPixel(int16_t x, int16_t y, uint16_t color);
-    GxEPD_Panel panel()
+    GxEPD2::Panel panel()
     {
       return _panel;
     }
@@ -68,12 +34,13 @@ class GxEPD2_32_3C : public Adafruit_GFX
     };
     bool hasPartialUpdate()
     {
-      return (_panel != GDEW0154Z04);
+      return (_panel != GxEPD2::GDEW0154Z04);
     };
     bool hasFastPartialUpdate()
     {
       return false;
     }
+    bool mirror(bool m);
     void init();
     void fillScreen(uint16_t color); // 0x0 black, >0x0 white, to buffer
     void setFullWindow();
@@ -82,6 +49,7 @@ class GxEPD2_32_3C : public Adafruit_GFX
     bool nextPage();
     // partial update keeps power on
     void powerOff(void);
+    void drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color);
   private:
     template <typename T> static inline void
     swap(T& a, T& b)
@@ -122,13 +90,13 @@ class GxEPD2_32_3C : public Adafruit_GFX
       return (a > b ? a : b);
     };
   protected:
-    GxEPD_Panel _panel;
+    GxEPD2::Panel _panel;
     int8_t _cs, _dc, _rst, _busy;
     uint8_t _busy_active_level;
     uint16_t _width_bytes, _pixel_bytes;
     int16_t _current_page;
     uint16_t _pages, _page_height;
-    bool _initial, _power_is_on, _using_partial_mode, _second_phase;
+    bool _initial, _power_is_on, _using_partial_mode, _second_phase, _mirror;
     uint16_t _pw_x, _pw_y, _pw_w, _pw_h;
     uint8_t _black_buffer[buffer_size];
     uint8_t _red_buffer[buffer_size];

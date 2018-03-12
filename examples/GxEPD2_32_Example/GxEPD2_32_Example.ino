@@ -32,50 +32,50 @@
 
 #if defined (ESP8266)
 // select one and adapt to your mapping
-GxEPD2_32_BW display(GxEPD2_32_BW::GDEP015OC1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDE0213B1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEH029A1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW027W3, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW042T2, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW075T8,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0154Z04,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0213Z16,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW029Z10,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW027C44,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW042Z15,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 #endif
 
 #if defined(ESP32)
 // select one and adapt to your mapping
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEP015OC1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDE0213B1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEH029A1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW027W3, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW042T2, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW075T8, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0154Z04, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0213Z16, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW029Z10,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW027C44,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW042Z15,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 #endif
 
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
 // select one and adapt to your mapping
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEP015OC1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDE0213B1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEH029A1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW027W3, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW042T2, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2_32_BW::GDEW075T8, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0154Z04, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW0213Z16, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW029Z10,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW027C44,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2_32_3C::GDEW042Z15,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 #endif
 
 void setup()
@@ -92,6 +92,7 @@ void setup()
   delay(1000);
   showFont("FreeMonoBold9pt7b", &FreeMonoBold9pt7b);
   delay(1000);
+  drawBitmaps();
   if (display.hasPartialUpdate())
   {
     showPartialUpdate();
@@ -359,4 +360,383 @@ void showPartialUpdate()
   }
 }
 
+// comment out unused bitmaps to reduce code space used
+
+#include "bitmaps/Bitmaps200x200.h" // 1.54" b/w
+#include "bitmaps/Bitmaps128x250.h" // 2.13" b/w
+#include "bitmaps/Bitmaps128x296.h" // 2.9"  b/w
+#include "bitmaps/Bitmaps176x264.h" // 2.7"  b/w
+#include "bitmaps/Bitmaps400x300.h" // 4.2"  b/w
+#include "bitmaps/Bitmaps640x384.h" // 7.5"  b/w
+// 3-color
+#include "bitmaps/Bitmaps3c200x200.h" // 1.54" b/w/r
+#include "bitmaps/Bitmaps3c104x212.h" // 2.13" b/w/r
+#include "bitmaps/Bitmaps3c128x296.h" // 2.9"  b/w/r
+#include "bitmaps/Bitmaps3c176x264.h" // 2.7"  b/w/r
+#include "bitmaps/Bitmaps3c400x300.h" // 4.2"  b/w/r
+
+void drawBitmaps()
+{
+#ifdef _GxBitmaps200x200_H_
+  drawBitmaps200x200();
+#endif
+#ifdef _GxBitmaps128x250_H_
+  drawBitmaps128x250();
+#endif
+#ifdef _GxBitmaps128x296_H_
+  drawBitmaps128x296();
+#endif
+#ifdef _GxBitmaps176x264_H_
+  drawBitmaps176x264();
+#endif
+#ifdef _GxBitmaps400x300_H_
+  drawBitmaps400x300();
+#endif
+#ifdef _GxBitmaps640x384_H_
+  drawBitmaps640x384();
+#endif
+  // 3-color
+#ifdef _GxBitmaps3c200x200_H_
+  drawBitmaps3c200x200();
+#endif
+#ifdef _GxBitmaps3c104x212_H_
+  drawBitmaps3c104x212();
+#endif
+#ifdef _GxBitmaps3c128x296_H_
+  drawBitmaps3c128x296();
+#endif
+#ifdef _GxBitmaps3c176x264_H_
+  drawBitmaps3c176x264();
+#endif
+#ifdef _GxBitmaps3c400x300_H_
+  drawBitmaps3c400x300();
+#endif
+}
+
+#ifdef _GxBitmaps200x200_H_
+void drawBitmaps200x200()
+{
+  const unsigned char* bitmaps[] =
+  {
+    logo200x200, first200x200, second200x200, third200x200, fourth200x200, fifth200x200, sixth200x200, senventh200x200, eighth200x200
+  };
+  if (display.panel() == GxEPD2::GDEP015OC1)
+  {
+    bool m = display.mirror(true);
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+    display.mirror(m);
+  }
+}
+#endif
+
+#ifdef _GxBitmaps128x250_H_
+void drawBitmaps128x250()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap128x250_1, logo128x250, first128x250, second128x250, third128x250
+  };
+  if (display.panel() == GxEPD2::GDE0213B1)
+  {
+    bool m = display.mirror(true);
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+    display.mirror(m);
+  }
+}
+#endif
+
+#ifdef _GxBitmaps128x296_H_
+void drawBitmaps128x296()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap128x296_1, logo128x296, first128x296, second128x296, third128x296
+  };
+  if (display.panel() == GxEPD2::GDEH029A1)
+  {
+    bool m = display.mirror(true);
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+    display.mirror(m);
+  }
+}
+#endif
+
+#ifdef _GxBitmaps176x264_H_
+void drawBitmaps176x264()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap176x264_1, Bitmap176x264_2
+  };
+  if (display.panel() == GxEPD2::GDEW027W3)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps400x300_H_
+void drawBitmaps400x300()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap400x300_1, Bitmap400x300_2
+  };
+  if (display.panel() == GxEPD2::GDEW042T2)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps640x384_H_
+void drawBitmaps640x384()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap640x384_1, Bitmap640x384_2
+  };
+  if (display.panel() == GxEPD2::GDEW075T8)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmaps[i], display.width(), display.height(), GxEPD_BLACK);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+struct bitmap_pair
+{
+  const unsigned char* black;
+  const unsigned char* red;
+};
+
+#ifdef _GxBitmaps3c200x200_H_
+void drawBitmaps3c200x200()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    //{Bitmap3c200x200_black, Bitmap3c200x200_red},
+    {WS_Bitmap3c200x200_black, WS_Bitmap3c200x200_red}
+  };
+  if (display.panel() == GxEPD2::GDEW0154Z04)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      // Bitmap3c200x200_black has 2 bits per pixel
+      // taken from Adafruit_GFX.cpp, modified
+      int16_t byteWidth = (display.width() + 7) / 8; // Bitmap scanline pad = whole byte
+      uint8_t byte = 0;
+      for (int16_t j = 0; j < display.height(); j++)
+      {
+        for (int16_t i = 0; i < display.width(); i++)
+        {
+          if (i & 3) byte <<= 2;
+          else
+          {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+            byte = pgm_read_byte(&Bitmap3c200x200_black[j * byteWidth * 2 + i / 4]);
+#else
+            byte = Bitmap3c200x200_black[j * byteWidth * 2 + i / 4];
+#endif
+          }
+          if (!(byte & 0x80))
+          {
+            display.drawPixel(i, j, GxEPD_BLACK);
+          }
+        }
+      }
+      display.drawInvertedBitmap(0, 0, Bitmap3c200x200_red, display.width(), display.height(), GxEPD_RED);
+    }
+    while (display.nextPage());
+    delay(2000);
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps3c104x212_H_
+void drawBitmaps3c104x212()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    {Bitmap3c104x212_1_black, Bitmap3c104x212_1_red},
+    {Bitmap3c104x212_2_black, Bitmap3c104x212_2_red},
+    {WS_Bitmap3c104x212_black, WS_Bitmap3c104x212_red}
+  };
+  if (display.panel() == GxEPD2::GDEW0213Z16)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
+        if (bitmap_pairs[i].red == WS_Bitmap3c104x212_red)
+        {
+          display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+        }
+        else display.drawBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps3c128x296_H_
+void drawBitmaps3c128x296()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    {Bitmap3c128x296_1_black, Bitmap3c128x296_1_red},
+    {Bitmap3c128x296_2_black, Bitmap3c128x296_2_red},
+    {WS_Bitmap3c128x296_black, WS_Bitmap3c128x296_red}
+  };
+  if (display.panel() == GxEPD2::GDEW029Z10)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
+        if (bitmap_pairs[i].red == WS_Bitmap3c128x296_red)
+        {
+          display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+        }
+        else display.drawBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps3c176x264_H_
+void drawBitmaps3c176x264()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    {Bitmap3c176x264_black, Bitmap3c176x264_red}
+  };
+  if (display.panel() == GxEPD2::GDEW027C44)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
+        display.drawBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
+
+#ifdef _GxBitmaps3c400x300_H_
+void drawBitmaps3c400x300()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    {Bitmap3c400x300_1_black, Bitmap3c400x300_1_red},
+    {Bitmap3c400x300_2_black, Bitmap3c400x300_2_red},
+    {WS_Bitmap3c400x300_black, WS_Bitmap3c400x300_red}
+  };
+  if (display.panel() == GxEPD2::GDEW042Z15)
+  {
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.firstPage();
+      do
+      {
+        display.fillScreen(GxEPD_WHITE);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
+        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+      }
+      while (display.nextPage());
+      delay(2000);
+    }
+  }
+}
+#endif
 
