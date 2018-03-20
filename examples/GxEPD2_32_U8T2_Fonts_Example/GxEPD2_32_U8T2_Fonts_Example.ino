@@ -85,6 +85,22 @@ GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2,
 //GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 #endif
 
+#if defined(__AVR) || defined(ARDUINO_ARCH_SAM)
+// select one and adapt to your mapping
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+// 3-color e-papers
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15, /*CS=10*/ SS, /*DC=*/ 8, /*RST=*/ 9, /*BUSY=*/ 7);
+#endif
+
 U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
 
 void setup()
@@ -100,7 +116,8 @@ void setup()
   delay(1000);
   helloEpaper();
   delay(1000);
-  //showFont("u8g2_font_helvR14_tf", u8g2_font_helvR14_tf); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  showFont("u8g2_font_helvR14_tf", u8g2_font_helvR14_tf); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  delay(2000);
   showFont("u8g2_font_profont22_mr", u8g2_font_profont22_mr); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
   delay(1000);
   Serial.println("setup done");
@@ -223,6 +240,8 @@ void drawFont(const char name[])
   u8g2_for_adafruit_gfx.println("`abcdefghijklmno");
   u8g2_for_adafruit_gfx.setCursor(0, y += dy);
   u8g2_for_adafruit_gfx.println("pqrstuvwxyz{|}~ ");
+  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.println("Umlaut ÄÖÜäéöü");
 }
 
 
