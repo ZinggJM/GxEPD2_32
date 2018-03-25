@@ -236,6 +236,32 @@ void GxEPD2_32_3C_X::powerOff(void)
   _PowerOff();
 }
 
+void GxEPD2_32_3C_X::drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color)
+{
+  // taken from Adafruit_GFX.cpp, modified
+  int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+  uint8_t byte = 0;
+  for (int16_t j = 0; j < h; j++)
+  {
+    for (int16_t i = 0; i < w; i++ )
+    {
+      if (i & 7) byte <<= 1;
+      else
+      {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+        byte = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
+#else
+        byte = bitmap[j * byteWidth + i / 8];
+#endif
+      }
+      if (!(byte & 0x80))
+      {
+        drawPixel(x + i, y + j, color);
+      }
+    }
+  }
+}
+
 bool GxEPD2_32_3C_X::_nextPageFull()
 {
   uint16_t page_ys = _current_page * _page_height;
@@ -958,5 +984,4 @@ void GxEPD2_32_3C_X::_rotate(uint16_t& x, uint16_t& y, uint16_t& w, uint16_t& h)
       break;
   }
 }
-
 

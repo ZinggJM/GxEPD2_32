@@ -87,18 +87,25 @@ GxEPD2_32_3C_X display(GxEPD2_32_3C_X::GDEW075Z09,  /*CS=D8*/ SS, /*DC=D3*/ 0, /
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println();
   Serial.println("setup");
   display.init();
+  
+  drawBitmaps();
+  
   helloWorld();
   delay(1000);
+  
   helloArduino();
   delay(1000);
   helloEpaper();
   delay(1000);
+  
   showFont("FreeMonoBold9pt7b", &FreeMonoBold9pt7b);
   delay(1000);
+  
+  
   if (display.hasPartialUpdate())
   {
     showPartialUpdate();
@@ -107,6 +114,7 @@ void setup()
   //drawCornerTest();
   //showBox(16, 16, 48, 32, false);
   //showBox(16, 56, 48, 32, true);
+  
   Serial.println("setup done");
 }
 
@@ -116,7 +124,8 @@ void loop()
 
 void helloWorld()
 {
-  //Serial.println("helloWorld");
+  Serial.println("helloWorld");
+  display.setFullWindow();
   display.setRotation(1);
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(GxEPD_BLACK);
@@ -130,12 +139,12 @@ void helloWorld()
     display.println("Hello World!");
   }
   while (display.nextPage());
-  //Serial.println("helloWorld done");
+  Serial.println("helloWorld done");
 }
 
 void helloArduino()
 {
-  //Serial.println("helloArduino");
+  Serial.println("helloArduino");
   display.setRotation(1);
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(display.hasColor() ? GxEPD_RED : GxEPD_BLACK);
@@ -151,18 +160,19 @@ void helloArduino()
   }
   while (display.nextPage());
   delay(1000);
-  //Serial.println("helloArduino done");
+  Serial.println("helloArduino done");
 }
 
 void helloEpaper()
 {
-  //Serial.println("helloEpaper");
+  Serial.println("helloEpaper");
   display.setRotation(1);
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(display.hasColor() ? GxEPD_RED : GxEPD_BLACK);
   uint16_t x = (display.width() - 160) / 2;
   uint16_t y = display.height() * 3 / 4;
   display.setPartialWindow(0, y - 14, display.width(), 20);
+  
   display.firstPage();
   do
   {
@@ -171,7 +181,7 @@ void helloEpaper()
     display.println("Hello E-Paper!");
   }
   while (display.nextPage());
-  //Serial.println("helloEpaper done");
+  Serial.println("helloEpaper done");
 }
 
 void showBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial)
@@ -238,6 +248,7 @@ void drawFont(const char name[], const GFXfont* f)
   //display.setRotation(0);
   display.fillScreen(GxEPD_WHITE);
   display.setTextColor(GxEPD_BLACK);
+  
   display.setFont(f);
   display.setCursor(0, 0);
   display.println();
@@ -366,4 +377,277 @@ void showPartialUpdate()
   }
 }
 
+// comment out unused bitmaps to reduce code space used
 
+#include "bitmaps/Bitmaps640x384.h" // 7.5"  b/w
+// 3-color
+#include "bitmaps/Bitmaps3c200x200.h" // 1.54" b/w/r
+#include "bitmaps/Bitmaps3c400x300.h" // 4.2"  b/w/r
+
+void drawBitmaps()
+{
+  display.setRotation(0);
+#ifdef _GxBitmaps200x200_H_
+  drawBitmaps200x200();
+#endif
+#ifdef _GxBitmaps128x250_H_
+  drawBitmaps128x250();
+#endif
+#ifdef _GxBitmaps128x296_H_
+  drawBitmaps128x296();
+#endif
+#ifdef _GxBitmaps176x264_H_
+  drawBitmaps176x264();
+#endif
+#ifdef _GxBitmaps400x300_H_
+  drawBitmaps400x300();
+#endif
+#ifdef _GxBitmaps640x384_H_
+  drawBitmaps640x384();
+#endif
+  // 3-color
+#ifdef _GxBitmaps3c200x200_H_
+  drawBitmaps3c200x200();
+#endif
+#ifdef _GxBitmaps3c104x212_H_
+  drawBitmaps3c104x212();
+#endif
+#ifdef _GxBitmaps3c128x296_H_
+  drawBitmaps3c128x296();
+#endif
+#ifdef _GxBitmaps3c176x264_H_
+  drawBitmaps3c176x264();
+#endif
+#ifdef _GxBitmaps3c400x300_H_
+  drawBitmaps3c400x300();
+#endif
+}
+
+#ifdef _GxBitmaps200x200_H_
+void drawBitmaps200x200()
+{
+  const unsigned char* bitmaps[] =
+  {
+    logo200x200, first200x200, second200x200, third200x200, fourth200x200, fifth200x200, sixth200x200, senventh200x200, eighth200x200
+  };
+  
+  //bool m = display.mirror(true);
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmaps[i], 200, 200, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+  //display.mirror(m);
+
+}
+#endif
+
+#ifdef _GxBitmaps128x250_H_
+void drawBitmaps128x250()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap128x250_1, logo128x250, first128x250, second128x250, third128x250
+  };
+  
+  bool m = display.mirror(true);
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmaps[i], 128, 250, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+  display.mirror(m);
+  
+}
+#endif
+
+#ifdef _GxBitmaps128x296_H_
+void drawBitmaps128x296()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap128x296_1, logo128x296, first128x296, second128x296, third128x296
+  };
+  
+  bool m = display.mirror(true);
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmaps[i], 128, 296, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+  display.mirror(m);
+  
+}
+#endif
+
+#ifdef _GxBitmaps176x264_H_
+void drawBitmaps176x264()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap176x264_1, Bitmap176x264_2
+  };
+  
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmaps[i], 176, 264, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+}
+#endif
+
+#ifdef _GxBitmaps400x300_H_
+void drawBitmaps400x300()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap400x300_1, Bitmap400x300_2
+  };
+ 
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap((display.width()-400)/2, (display.height()-300)/2, bitmaps[i], 400, 300, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+}
+#endif
+
+#ifdef _GxBitmaps640x384_H_
+void drawBitmaps640x384()
+{
+  const unsigned char* bitmaps[] =
+  {
+    Bitmap640x384_1, Bitmap640x384_2
+  };
+  
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmaps[i], 640, 384, GxEPD_BLACK);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+}
+#endif
+
+struct bitmap_pair
+{
+  const unsigned char* black;
+  const unsigned char* red;
+};
+
+#ifdef _GxBitmaps3c200x200_H_
+void drawBitmaps3c200x200()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    //{Bitmap3c200x200_black, Bitmap3c200x200_red},
+    {WS_Bitmap3c200x200_black, WS_Bitmap3c200x200_red}
+  };
+  
+  display.firstPage();
+  do
+  {
+    display.fillScreen(GxEPD_WHITE);
+    // Bitmap3c200x200_black has 2 bits per pixel
+    // taken from Adafruit_GFX.cpp, modified
+    int16_t byteWidth = (200 + 7) / 8; // Bitmap scanline pad = whole byte
+    uint8_t byte = 0;
+    for (int16_t j = 0; j < 200; j++)
+    {
+      for (int16_t i = 0; i < 200; i++)
+      {
+        if (i & 3) byte <<= 2;
+        else
+        {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+          byte = pgm_read_byte(&Bitmap3c200x200_black[j * byteWidth * 2 + i / 4]);
+#else
+          byte = Bitmap3c200x200_black[j * byteWidth * 2 + i / 4];
+#endif
+        }
+        if (!(byte & 0x80))
+        {
+          display.drawPixel(i, j, GxEPD_BLACK);
+        }
+      }
+    }
+    display.drawInvertedBitmap(0, 0, Bitmap3c200x200_red, 200, 200, GxEPD_RED);
+  }
+  while (display.nextPage());
+  delay(2000);
+  for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, 200, 200, GxEPD_BLACK);
+      display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, 200, 200, GxEPD_RED);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+}
+#endif
+
+
+
+#ifdef _GxBitmaps3c400x300_H_
+void drawBitmaps3c400x300()
+{
+  bitmap_pair bitmap_pairs[] =
+  {
+    {Bitmap3c400x300_1_black, Bitmap3c400x300_1_red},
+    {Bitmap3c400x300_2_black, Bitmap3c400x300_2_red},
+    {WS_Bitmap3c400x300_black, WS_Bitmap3c400x300_red}
+  };
+  
+  for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+  {
+    display.firstPage();
+    do
+    {
+      display.fillScreen(GxEPD_WHITE);
+      display.drawInvertedBitmap((display.width()-400)/2, (display.height()-300)/2, bitmap_pairs[i].black, 400, 300, GxEPD_BLACK);
+      display.drawInvertedBitmap((display.width()-400)/2, (display.height()-300)/2, bitmap_pairs[i].red, 400, 300, GxEPD_RED);
+    }
+    while (display.nextPage());
+    delay(2000);
+  }
+}
+#endif
