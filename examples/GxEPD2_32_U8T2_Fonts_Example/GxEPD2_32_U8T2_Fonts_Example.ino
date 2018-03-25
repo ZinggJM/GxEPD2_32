@@ -219,28 +219,28 @@ void drawFont(const char name[])
 {
   //display.setRotation(0);
   display.fillScreen(GxEPD_WHITE);
-  uint16_t y = 0;
-  uint16_t dy = 22;
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  uint16_t dy = u8g2_for_adafruit_gfx.getFontAscent() - u8g2_for_adafruit_gfx.getFontDescent();
+  u8g2_for_adafruit_gfx.setCursor(0, 0);
   u8g2_for_adafruit_gfx.println();
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println(name);
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println(" !\"#$%&'()*+,-./");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println("0123456789:;<=>?");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println("@ABCDEFGHIJKLMNO");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println("PQRSTUVWXYZ[\\]^_");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   if (display.hasColor())
   {
     u8g2_for_adafruit_gfx.setForegroundColor(GxEPD_RED);
   }
   u8g2_for_adafruit_gfx.println("`abcdefghijklmno");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println("pqrstuvwxyz{|}~ ");
-  u8g2_for_adafruit_gfx.setCursor(0, y += dy);
+  u8g2_for_adafruit_gfx.setCursor(0, u8g2_for_adafruit_gfx.getCursorY() + dy); // issue #5
   u8g2_for_adafruit_gfx.println("Umlaut ÄÖÜäéöü");
 }
 
