@@ -20,5 +20,7 @@ Simplified Version of GxEPD for 32 Bit Arduino
 - Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
 - Good Dispay ePaper for Arduino : https://forum.arduino.cc/index.php?topic=436411.0
 
-### Version 1.0.1
+### Version 1.0.2
+- additional font support, e.g. from https://github.com/olikraus/U8g2_for_Adafruit_GFX
+#### Version 1.0.1
 - Example Bitmaps & 4.2" b/w fast partial update
