@@ -185,6 +185,7 @@ void GxEPD2_32_3C::firstPage()
         case GxEPD2::GDEW0213Z16:
         case GxEPD2::GDEW029Z10:
         case GxEPD2::GDEW042Z15:
+        case GxEPD2::GDEW075Z09:
           _Init_Part();
           _writeCommand(0x91); // partial in
           _setPartialRamArea(_pw_x, _pw_y, _pw_w, _pw_h);
@@ -213,6 +214,8 @@ bool GxEPD2_32_3C::nextPage()
         return _nextPageFull();
       case GxEPD2::GDEW027C44:
         return _nextPageFull27();
+      case GxEPD2::GDEW075Z09:
+        return _nextPageFull75();
     }
   }
   else if ((_pw_w > 0) && (_pw_h > 0))
@@ -225,6 +228,8 @@ bool GxEPD2_32_3C::nextPage()
         return _nextPagePart();
       case GxEPD2::GDEW027C44:
         return _nextPagePart27();
+      case GxEPD2::GDEW075Z09:
+        return _nextPagePart75();
     }
   }
   return false;
@@ -473,16 +478,76 @@ bool GxEPD2_32_3C::_nextPagePart27()
   return false;
 }
 
-void GxEPD2_32_3C::_send8pixel(uint8_t data)
+bool GxEPD2_32_3C::_nextPageFull75()
+{
+  uint16_t page_ys = _current_page * _page_height;
+  uint16_t bytes = (_current_page < (_pages - 1) ? _page_height : HEIGHT - page_ys) * _width_bytes;
+  for (uint16_t idx = 0; idx < bytes; idx++)
+  {
+    _send8pixel(_black_buffer[idx], _red_buffer[idx]);
+  }
+  _current_page++;
+  if (_current_page < _pages)
+  {
+    return true;
+  }
+  _Update_Full();
+  delay(200);
+  _PowerOff();
+  _current_page = -1;
+  return false;
+}
+
+bool GxEPD2_32_3C::_nextPagePart75()
+{
+  uint16_t page_ys = _current_page * _page_height;
+  uint16_t page_ye = _current_page < (_pages - 1) ? page_ys + _page_height : HEIGHT;
+  uint16_t dest_ys = gx_uint16_max(_pw_y, page_ys);
+  uint16_t dest_ye = gx_uint16_min(_pw_y + _pw_h, page_ye);
+  if (dest_ye > dest_ys)
+  {
+    uint16_t xe_d8 = ((_pw_x + _pw_w - 1) | 0x0007) / 8; // byte boundary inclusive (last byte)
+    uint16_t xs_d8 = _pw_x / 8; // byte boundary
+    uint16_t ys = dest_ys - page_ys;
+    uint16_t ye = dest_ye - page_ys; // exclusive
+    for (uint16_t y = ys; y < ye; y++)
+    {
+      for (uint16_t x = xs_d8; x <= xe_d8; x++)
+      {
+        uint16_t idx = x + y * _width_bytes;
+        _send8pixel(_black_buffer[idx], _red_buffer[idx]);
+      }
+    }
+  }
+  _current_page++;
+  if (_current_page < _pages)
+  {
+    fillScreen(GxEPD_WHITE);
+    return true;
+  }
+  _Update_Part();
+  _writeCommand(0x92); // partial out
+  _current_page = -1;
+  return false;
+}
+
+void GxEPD2_32_3C::_send8pixel(uint8_t black_data, uint8_t red_data)
 {
   for (uint8_t j = 0; j < 8; j++)
   {
-    uint8_t t = data & 0x80 ? 0x00 : 0x03;
+    uint8_t t = 0x00; // black
+    if (black_data & 0x80); // keep black
+    else if (red_data & 0x80) t = 0x04; //red
+    else t = 0x03; // white
     t <<= 4;
-    data <<= 1;
+    black_data <<= 1;
+    red_data <<= 1;
     j++;
-    t |= data & 0x80 ? 0x00 : 0x03;
-    data <<= 1;
+    if (black_data & 0x80); // keep black
+    else if (red_data & 0x80) t |= 0x04; //red
+    else t |= 0x03; // white
+    black_data <<= 1;
+    red_data <<= 1;
     _writeData(t);
   }
 }
@@ -530,7 +595,7 @@ void GxEPD2_32_3C::_waitWhileBusy(const char* comment)
   {
     if (digitalRead(_busy) != _busy_active_level) break;
     delay(1);
-    if (micros() - start > 20000000) // >14.9s !
+    if (micros() - start > (_panel == GxEPD2::GDEW075Z09 ? 40000000 : 20000000)) // > ? : >14.9s !
     {
       Serial.println("Busy Timeout!");
       break;
@@ -570,6 +635,7 @@ void GxEPD2_32_3C::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16
       //_writeData(0x00); // don't see any difference
       break;
     case GxEPD2::GDEW042Z15:
+    case GxEPD2::GDEW075Z09:
       x &= 0xFFF8; // byte boundary
       xe |= 0x0007; // byte boundary
       _writeCommand(0x90); // partial window
@@ -772,6 +838,44 @@ void GxEPD2_32_3C::_InitDisplay()
       //_waitWhileBusy("Power On");
       _writeCommand(0x00);
       _writeData(0x0f); // LUT from OTP Pixel with B/W/R.
+      break;
+    case GxEPD2::GDEW075Z09:
+      /**********************************release flash sleep**********************************/
+      _writeCommand(0X65);     //FLASH CONTROL
+      _writeData(0x01);
+      _writeCommand(0xAB);
+      _writeCommand(0X65);     //FLASH CONTROL
+      _writeData(0x00);
+      /**********************************release flash sleep**********************************/
+      _writeCommand(0x01);
+      _writeData (0x37);       //POWER SETTING
+      _writeData (0x00);
+      _writeCommand(0x04);     //POWER ON
+      _waitWhileBusy("POWER");
+      _writeCommand(0X00);     //PANNEL SETTING
+      _writeData(0xCF);
+      _writeData(0x08);
+      _writeCommand(0x06);     //boost
+      _writeData (0xc7);
+      _writeData (0xcc);
+      _writeData (0x28);
+      _writeCommand(0x30);     //PLL setting
+      _writeData (0x3c);
+      _writeCommand(0X41);     //TEMPERATURE SETTING
+      _writeData(0x00);
+      _writeCommand(0X50);     //VCOM AND DATA INTERVAL SETTING
+      _writeData(0x77);
+      _writeCommand(0X60);     //TCON SETTING
+      _writeData(0x22);
+      _writeCommand(0x61);     //tres 640*384
+      _writeData (0x02);       //source 640
+      _writeData (0x80);
+      _writeData (0x01);       //gate 384
+      _writeData (0x80);
+      _writeCommand(0X82);     //VDCS SETTING
+      _writeData(0x1E);        //decide by LUT file
+      _writeCommand(0xe5);     //FLASH MODE
+      _writeData(0x03);
       break;
   }
 }

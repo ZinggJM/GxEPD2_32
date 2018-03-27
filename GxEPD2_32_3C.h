@@ -63,7 +63,9 @@ class GxEPD2_32_3C : public Adafruit_GFX
     bool _nextPageFull154();
     bool _nextPageFull27();
     bool _nextPagePart27();
-    void _send8pixel(uint8_t data);
+    bool _nextPageFull75();
+    bool _nextPagePart75();
+    void _send8pixel(uint8_t black_data, uint8_t red_data);
     void _writeCommand(uint8_t c);
     void _writeData(uint8_t d);
     void _writeData(const uint8_t* data, uint16_t n);

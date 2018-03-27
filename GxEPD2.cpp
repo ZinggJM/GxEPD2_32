@@ -14,6 +14,7 @@ const GxEPD2::ScreenDimensionType GxEPD2::ScreenDimensions[]
   {104, 212}, // GDEW0213Z16
   {128, 296}, // GDEW029Z10
   {176, 264}, // GDEW027C44
-  {400, 300}  // GDEW042Z15
+  {400, 300}, // GDEW042Z15
+  {640, 384}  // GDEW075Z09
 };
 

@@ -44,6 +44,7 @@
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 #endif
 
 #if defined(ESP32)
@@ -60,6 +61,7 @@
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 #endif
 
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
@@ -76,6 +78,7 @@
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 #endif
 
 void setup()

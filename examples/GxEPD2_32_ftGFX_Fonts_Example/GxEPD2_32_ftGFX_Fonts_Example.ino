@@ -235,11 +235,11 @@ void showCharacterSet(uint8_t font)
   uint16_t chr = 0x20;
   for (uint16_t page = 0; page <= pages; page++)
   {
-    ftGFX.setCursor(0, 0);
     display.firstPage();
     do
     {
       uint16_t pchr = chr;
+      ftGFX.setCursor(0, 0);
       display.fillScreen(GxEPD_WHITE);
       for (uint16_t l = 0; (l <= lines) && (pchr < 255); l++)
       {
