@@ -549,7 +549,7 @@ void drawBitmaps640x384()
   {
     Bitmap640x384_1, Bitmap640x384_2
   };
-  if (display.panel() == GxEPD2::GDEW075T8)
+  if (display.panel() == GxEPD2::GDEW075T8 || display.panel() == GxEPD2::GDEW075Z09)
   {
     for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
     {
@@ -725,7 +725,7 @@ void drawBitmaps3c400x300()
     {Bitmap3c400x300_2_black, Bitmap3c400x300_2_red},
     {WS_Bitmap3c400x300_black, WS_Bitmap3c400x300_red}
   };
-  if (display.panel() == GxEPD2::GDEW042Z15)
+  if (display.panel() == GxEPD2::GDEW042Z15 || display.panel() == GxEPD2::GDEW075Z09)
   {
     for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
     {
@@ -733,8 +733,8 @@ void drawBitmaps3c400x300()
       do
       {
         display.fillScreen(GxEPD_WHITE);
-        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].black, display.width(), display.height(), GxEPD_BLACK);
-        display.drawInvertedBitmap(0, 0, bitmap_pairs[i].red, display.width(), display.height(), GxEPD_RED);
+        display.drawInvertedBitmap((display.width()-400)/2, (display.height()-300)/2, bitmap_pairs[i].black, 400, 300, GxEPD_BLACK);
+        display.drawInvertedBitmap((display.width()-400)/2, (display.height()-300)/2, bitmap_pairs[i].red, 400, 300, GxEPD_RED);
       }
       while (display.nextPage());
       delay(2000);
