@@ -83,7 +83,11 @@
 
 void setup()
 {
+#if defined (ESP8266)
+  Serial.begin(9600);
+#else
   Serial.begin(115200);
+#endif
   Serial.println();
   Serial.println("setup");
   display.init();
