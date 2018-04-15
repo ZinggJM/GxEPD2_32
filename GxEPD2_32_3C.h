@@ -50,6 +50,9 @@ class GxEPD2_32_3C : public Adafruit_GFX
     // partial update keeps power on
     void powerOff(void);
     void drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color);
+    void beginRawPixels();
+    void sendRawPixels(uint8_t* bytes, int nbytes);
+    void endRawPixels();
   private:
     template <typename T> static inline void
     swap(T& a, T& b)
