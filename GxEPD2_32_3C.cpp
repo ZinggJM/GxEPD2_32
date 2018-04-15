@@ -41,6 +41,8 @@ GxEPD2_32_3C::GxEPD2_32_3C(GxEPD2::Panel panel, int8_t cs, int8_t dc, int8_t rst
 
 void GxEPD2_32_3C::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
+  int orgx=x;
+  int orgy=y;
   if ((x < 0) || (x >= width()) || (y < 0) || (y >= height())) return;
   if (_mirror) x = width() - x - 1;
   // check rotation, move pixel around if necessary
@@ -62,15 +64,24 @@ void GxEPD2_32_3C::drawPixel(int16_t x, int16_t y, uint16_t color)
   uint16_t i = x / 8 + y * _width_bytes;
   if (_current_page < 1)
   {
+    
     if (i >= sizeof(_black_buffer)) return;
   }
   else
   {
-    y -= _current_page * _page_height;
+    y -= (_current_page * _page_height);
+    
     if ((y < 0) || (y >= _page_height)) return;
     i = x / 8 + y * _width_bytes;
+    
+    
   }
-
+  
+  if ((x==0 || x==639) && (y<4 || y>184)) {
+	Serial.printf("drawPixel %03d %03d => %03d %03d", orgx, orgy, x, y);
+	Serial.println();
+  }
+	
   _black_buffer[i] = (_black_buffer[i] & (0xFF ^ (1 << (7 - x % 8)))); // white
   _red_buffer[i] = (_red_buffer[i] & (0xFF ^ (1 << (7 - x % 8)))); // white
   if (color == GxEPD_WHITE) return;
@@ -165,6 +176,24 @@ void GxEPD2_32_3C::setPartialWindow(uint16_t x, uint16_t y, uint16_t w, uint16_t
   {
     Serial.println("GDEW0154Z04 does not support partial update");
   }
+}
+
+void GxEPD2_32_3C::beginRawPixels()
+{
+	_Init_Full();
+	_writeCommand(0x10);
+}
+void GxEPD2_32_3C::sendRawPixels(uint8_t* bytes, int nbytes) 
+{
+	for (int i=0; i<nbytes; i++) {
+		_writeData(bytes[i]);
+	}
+}
+void GxEPD2_32_3C::endRawPixels()
+{
+	_Update_Full();
+	delay(200);
+	_PowerOff();
 }
 
 void GxEPD2_32_3C::firstPage()
