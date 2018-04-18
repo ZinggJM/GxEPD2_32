@@ -266,6 +266,407 @@ void GxEPD2_32_3C::drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap
   }
 }
 
+void GxEPD2_32_3C::clearScreen(uint8_t black_value, uint8_t red_value)
+{
+  switch (_panel)
+  {
+    case GxEPD2::GDEW0154Z04:
+      _Init_Full();
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(bw2grey[(black_value & 0xF0) >> 4]);
+        _writeData(bw2grey[black_value & 0x0F]);
+      }
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(red_value);
+      }
+      _Update_Full();
+      break;
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
+    case GxEPD2::GDEW042Z15:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(black_value);
+      }
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(red_value);
+      }
+      _Update_Part();
+      _writeCommand(0x92); // partial out
+      break;
+    case GxEPD2::GDEW027C44:
+      _Init_Part();
+      _setPartialRamArea27(0x14, 0, 0, WIDTH, HEIGHT);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(~black_value);
+      }
+      _setPartialRamArea27(0x15, 0, 0, WIDTH, HEIGHT);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(~red_value);
+      }
+      _refreshWindow(0, 0, WIDTH, HEIGHT);
+      _waitWhileBusy("clearScreen");
+      break;
+    case GxEPD2::GDEW075Z09:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _send8pixel(~black_value, ~red_value);
+      }
+      _Update_Part();
+      _writeCommand(0x92); // partial out
+      break;
+  }
+}
+
+void GxEPD2_32_3C::writeScreenBuffer(uint8_t black_value, uint8_t red_value)
+{
+  switch (_panel)
+  {
+    case GxEPD2::GDEW0154Z04:
+      _Init_Full();
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(bw2grey[(black_value & 0xF0) >> 4]);
+        _writeData(bw2grey[black_value & 0x0F]);
+      }
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(red_value);
+      }
+      break;
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
+    case GxEPD2::GDEW042Z15:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(black_value);
+      }
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(red_value);
+      }
+      _writeCommand(0x92); // partial out
+      break;
+    case GxEPD2::GDEW027C44:
+      _Init_Part();
+      _setPartialRamArea27(0x14, 0, 0, WIDTH, HEIGHT);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(~black_value);
+      }
+      _setPartialRamArea27(0x15, 0, 0, WIDTH, HEIGHT);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(~red_value);
+      }
+      break;
+    case GxEPD2::GDEW075Z09:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _send8pixel(~black_value, ~red_value);
+      }
+      _writeCommand(0x92); // partial out
+      break;
+  }
+}
+
+void GxEPD2_32_3C::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  writeImage(bitmap, NULL, x, y, w, h, invert, mirror_y, pgm);
+}
+
+void GxEPD2_32_3C::writeImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  x -= x % 8; // byte boundary
+  w -= x % 8; // byte boundary
+  int16_t x1 = x < 0 ? 0 : x; // limit
+  int16_t y1 = y < 0 ? 0 : y; // limit
+  int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
+  int16_t h1 = y + h < HEIGHT ? h : HEIGHT - y; // limit
+  int16_t dx = x1 - x;
+  int16_t dy = y1 - y;
+  w1 -= dx;
+  h1 -= dy;
+  if ((w1 <= 0) || (h1 <= 0)) return;
+  switch (_panel)
+  {
+    case GxEPD2::GDEW0154Z04:
+      _Init_Full();
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < HEIGHT; i++)
+      {
+        for (int16_t j = 0; j < WIDTH; j += 8)
+        {
+          uint8_t data = 0xFF;
+          if (black)
+          {
+            // use w, h of bitmap for index!
+            //if ((i + dy < h) && (j + dx < w))
+            if (((x + j) >= 0) && ((x + j) < w) && ((y + i) >= 0) && ((y + i) < h))
+            {
+              int16_t idx = mirror_y ? (x + j) / 8 + ((h - 1 - (y + i))) * (w / 8) : (x + j) / 8 + (y + i) * (w / 8);
+              if (pgm)
+              {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+                data = pgm_read_byte(&black[idx]);
+#else
+                data = black[idx];
+#endif
+              }
+              else
+              {
+                data = black[idx];
+              }
+              if (invert) data = ~data;
+            }
+          }
+          //_writeData(data);
+          _writeData(bw2grey[(data & 0xF0) >> 4]);
+          _writeData(bw2grey[data & 0x0F]);
+        }
+      }
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < HEIGHT; i++)
+      {
+        for (int16_t j = 0; j < WIDTH; j += 8)
+        {
+          uint8_t data = 0xFF;
+          if (red)
+          {
+            // use w, h of bitmap for index!
+            //if ((i + dy < h) && (j + dx < w))
+            if (((x + j) >= 0) && ((x + j) < w) && ((y + i) >= 0) && ((y + i) < h))
+            {
+              int16_t idx = mirror_y ? (x + j) / 8 + ((h - 1 - (y + i))) * (w / 8) : (x + j) / 8 + (y + i) * (w / 8);
+              if (pgm)
+              {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+                data = pgm_read_byte(&red[idx]);
+#else
+                data = red[idx];
+#endif
+              }
+              else
+              {
+                data = red[idx];
+              }
+              if (invert) data = ~data;
+            }
+          }
+          _writeData(data);
+        }
+      }
+      return;
+    case GxEPD2::GDEW075Z09:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(x1, y1, w1, h1);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < h1; i++)
+      {
+        for (int16_t j = 0; j < w1 / 8; j++)
+        {
+          uint8_t black_data = 0xFF;
+          uint8_t red_data = 0xFF;
+          if (black)
+          {
+            // use w, h of bitmap for index!
+            int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+            if (pgm)
+            {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+              black_data = pgm_read_byte(&black[idx]);
+#else
+              black_data = black[idx];
+#endif
+            }
+            else
+            {
+              black_data = black[idx];
+            }
+            if (invert) black_data = ~black_data;
+          }
+          if (red)
+          {
+            // use w, h of bitmap for index!
+            int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+            if (pgm)
+            {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+              red_data = pgm_read_byte(&red[idx]);
+#else
+              red_data = red[idx];
+#endif
+            }
+            else
+            {
+              red_data = red[idx];
+            }
+            if (invert) red_data = ~red_data;
+          }
+          _send8pixel(~black_data, ~red_data);
+        }
+      }
+      _writeCommand(0x92); // partial out
+      return;
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
+    case GxEPD2::GDEW042Z15:
+      _Init_Part();
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(x1, y1, w1, h1);
+      _writeCommand(0x10);
+      break;
+    case GxEPD2::GDEW027C44:
+      _Init_Part();
+      _setPartialRamArea27(0x14, x1, y1, w1, h1);
+      break;
+  }
+  for (int16_t i = 0; i < h1; i++)
+  {
+    for (int16_t j = 0; j < w1 / 8; j++)
+    {
+      uint8_t data = 0xFF;
+      if (black)
+      {
+        // use w, h of bitmap for index!
+        int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+        if (pgm)
+        {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+          data = pgm_read_byte(&black[idx]);
+#else
+          data = black[idx];
+#endif
+        }
+        else
+        {
+          data = black[idx];
+        }
+        if (invert) data = ~data;
+      }
+      if (_panel == GxEPD2::GDEW027C44) data = ~data;
+      _writeData(data);
+    }
+  }
+  switch (_panel)
+  {
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
+    case GxEPD2::GDEW042Z15:
+      _writeCommand(0x13);
+      break;
+    case GxEPD2::GDEW027C44:
+      _setPartialRamArea27(0x15, x1, y1, w1, h1);
+      break;
+  }
+  for (int16_t i = 0; i < h1; i++)
+  {
+    for (int16_t j = 0; j < w1 / 8; j++)
+    {
+      uint8_t data = 0xFF;
+      if (red)
+      {
+        // use w, h of bitmap for index!
+        int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+        if (pgm)
+        {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+          data = pgm_read_byte(&red[idx]);
+#else
+          data = red[idx];
+#endif
+        }
+        else
+        {
+          data = red[idx];
+        }
+        if (invert) data = ~data;
+      }
+      if (_panel == GxEPD2::GDEW027C44) data = ~data;
+      _writeData(data);
+    }
+  }
+  if (_panel != GxEPD2::GDEW027C44)
+  {
+    _writeCommand(0x92); // partial out
+  }
+}
+
+void GxEPD2_32_3C::drawImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  writeImage(bitmap, x, y, w, h, invert, mirror_y, pgm);
+  refresh(x, y, w, h);
+}
+
+void GxEPD2_32_3C::drawImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  writeImage(black, red, x, y, w, h, invert, mirror_y, pgm);
+  refresh(x, y, w, h);
+}
+
+void GxEPD2_32_3C::refresh()
+{
+  refresh(0, 0, WIDTH, HEIGHT);
+}
+
+void GxEPD2_32_3C::refresh(int16_t x, int16_t y, int16_t w, int16_t h)
+{
+  x -= x % 8; // byte boundary
+  w -= x % 8; // byte boundary
+  int16_t x1 = x < 0 ? 0 : x; // limit
+  int16_t y1 = y < 0 ? 0 : y; // limit
+  int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
+  int16_t h1 = y + h < HEIGHT ? h : HEIGHT - y; // limit
+  w1 -= x1 - x;
+  h1 -= y1 - y;
+  switch (_panel)
+  {
+    case GxEPD2::GDEW0154Z04:
+      _Update_Full();
+      break;
+    case GxEPD2::GDEW0213Z16:
+    case GxEPD2::GDEW029Z10:
+    case GxEPD2::GDEW042Z15:
+    case GxEPD2::GDEW075Z09:
+      _Init_Part();
+      _setPartialRamArea(x1, y1, w1, h1);
+      _Update_Part();
+      break;
+    case GxEPD2::GDEW027C44:
+      _refreshWindow(x1, y1, w1, h1);
+      _waitWhileBusy("refresh");
+      break;
+  }
+}
+
 bool GxEPD2_32_3C::_nextPageFull()
 {
   uint16_t page_ys = _current_page * _page_height;

@@ -20,7 +20,14 @@ Simplified Version of GxEPD for 32 Bit Arduino
 - Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
 - Good Dispay ePaper for Arduino : https://forum.arduino.cc/index.php?topic=436411.0
 
-### Version 1.0.3
+### Version 1.0.4
+- Support for Bitmaps (Sprites) to Controller Buffer and to Screen
+- the bitmaps can reside in RAM or ROM, parameter pgm, default RAM
+- origin x and width should be multiple of 8, are rounded down
+- cropping to screen dimensions is handled
+- allows tiled drawing for bitmaps from SD, SPIFFS or WiFi download
+- use e.g. writeImage(...) for each tile, followed by refresh() for all
+#### Version 1.0.3
 - support for GDEW075Z09 7.5" 3-color moved to GxEPD2_32_3C
 - not tested by me, but one user reported succesful use
 - NOT RECOMMENDED, as it has extremely long refresh time reported

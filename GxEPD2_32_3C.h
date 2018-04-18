@@ -50,6 +50,17 @@ class GxEPD2_32_3C : public Adafruit_GFX
     // partial update keeps power on
     void powerOff(void);
     void drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color);
+    //  Support for Bitmaps (Sprites) to Controller Buffer and to Screen
+    void clearScreen(uint8_t black_value = 0xFF, uint8_t red_value = 0xFF); // init controller memory and screen (default white)
+    void writeScreenBuffer(uint8_t black_value = 0xFF, uint8_t red_value = 0xFF); // init controller memory (default white)
+    // write to controller memory, without screen refresh; x and w should be multiple of 8
+    void writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void writeImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    // write to controller memory, with screen refresh; x and w should be multiple of 8
+    void drawImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void drawImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
+    void refresh(); // screen refresh from controller memory to full screen
+    void refresh(int16_t x, int16_t y, int16_t w, int16_t h); // screen refresh from controller memory, partial screen
   private:
     template <typename T> static inline void
     swap(T& a, T& b)

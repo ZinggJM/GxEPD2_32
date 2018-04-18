@@ -439,6 +439,40 @@ void drawBitmaps200x200()
     }
     display.mirror(m);
   }
+  else
+  {
+    bool mirror_y = (display.panel() != GxEPD2::GDE0213B1);
+    display.clearScreen(0xFF);
+    uint16_t x = (display.width() - 200) / 2;
+    uint16_t y = (display.height() - 200) / 2;
+    for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+    {
+      display.drawImage(bitmaps[i], x, y, 200, 200, false, mirror_y, true);
+      delay(2000);
+    }
+  }
+  bool mirror_y = (display.panel() != GxEPD2::GDE0213B1);
+  for (uint16_t i = 0; i < sizeof(bitmaps) / sizeof(char*); i++)
+  {
+    int16_t x = -60;
+    int16_t y = -60;
+    for (uint16_t j = 0; j < 10; j++)
+    {
+      display.writeScreenBuffer(0xFF);
+      display.writeImage(bitmaps[i], x, y, 200, 200, false, mirror_y, true);
+      display.refresh();
+      delay(2000);
+      x += 40;
+      y += 40;
+      if ((x >= display.width()) || (y >= display.height())) break;
+    }
+    break; // comment out for full show
+  }
+  display.writeScreenBuffer(0xFF);
+  display.writeImage(bitmaps[0], 0, 0, 200, 200, false, mirror_y, true);
+  display.writeImage(bitmaps[0], display.width() - 200, display.height() - 200, 200, 200, false, mirror_y, true);
+  display.refresh();
+  delay(2000);
 }
 #endif
 
@@ -625,6 +659,37 @@ void drawBitmaps3c200x200()
       while (display.nextPage());
       delay(2000);
     }
+  }
+  if (display.hasColor())
+  {
+    display.clearScreen(0xFF);
+    uint16_t x = (display.width() - 200) / 2;
+    uint16_t y = (display.height() - 200) / 2;
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      display.drawImage(bitmap_pairs[i].black, bitmap_pairs[i].red, x, y, 200, 200, false, false, true);
+      delay(2000);
+    }
+    for (uint16_t i = 0; i < sizeof(bitmap_pairs) / sizeof(bitmap_pair); i++)
+    {
+      int16_t x = -60;
+      int16_t y = -60;
+      for (uint16_t j = 0; j < 10; j++)
+      {
+        display.writeScreenBuffer(0xFF);
+        display.writeImage(bitmap_pairs[i].black, bitmap_pairs[i].red, x, y, 200, 200, false, false, true);
+        display.refresh();
+        delay(2000);
+        x += 40;
+        y += 40;
+        if ((x >= display.width()) || (y >= display.height())) break;
+      }
+    }
+    display.writeScreenBuffer(0xFF);
+    display.writeImage(bitmap_pairs[0].black, bitmap_pairs[0].red, 0, 0, 200, 200, false, false, true);
+    display.writeImage(bitmap_pairs[0].black, bitmap_pairs[0].red, display.width() - 200, display.height() - 200, 200, 200, false, false, true);
+    display.refresh();
+    delay(2000);
   }
 }
 #endif

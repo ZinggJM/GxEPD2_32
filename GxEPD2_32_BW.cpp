@@ -273,6 +273,270 @@ void GxEPD2_32_BW::drawInvertedBitmap(int16_t x, int16_t y, const uint8_t bitmap
   }
 }
 
+void GxEPD2_32_BW::clearScreen(uint8_t value)
+{
+  switch (_panel)
+  {
+    case GxEPD2::GDEP015OC1:
+    case GxEPD2::GDE0213B1:
+    case GxEPD2::GDEH029A1:
+      _Init_Part(_ram_data_entry_mode);
+      _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _Update_Part();
+      _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _Update_Part();
+      break;
+    case GxEPD2::GDEW027W3:
+      _Init_Part(_ram_data_entry_mode);
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _refreshWindow(0, 0, WIDTH, HEIGHT);
+      _waitWhileBusy("clearScreen");
+      break;
+    case GxEPD2::GDEW042T2:
+      if (_initial)
+      {
+        _Init_Full(_ram_data_entry_mode);
+        _writeCommand(0x13);
+        for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+        {
+          _writeData(value);
+        }
+        _Update_Full();
+        _initial = false;
+      }
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _Update_Part();
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _Update_Part();
+      _writeCommand(0x92); // partial out
+      break;
+    case GxEPD2::GDEW075T8:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _send8pixel(~value);
+      }
+      _Update_Part();
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _send8pixel(~value);
+      }
+      _Update_Part();
+      _writeCommand(0x92); // partial out
+      break;
+  }
+  _initial = false;
+}
+
+void GxEPD2_32_BW::writeScreenBuffer(uint8_t value)
+{
+  if (_initial) clearScreen(value);
+  else _writeScreenBuffer(value);
+}
+
+void GxEPD2_32_BW::_writeScreenBuffer(uint8_t value)
+{
+  switch (_panel)
+  {
+    case GxEPD2::GDEP015OC1:
+    case GxEPD2::GDE0213B1:
+    case GxEPD2::GDEH029A1:
+      _Init_Part(_ram_data_entry_mode);
+      _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      break;
+    case GxEPD2::GDEW027W3:
+    case GxEPD2::GDEW042T2:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _writeCommand(0x92); // partial out
+      break;
+    case GxEPD2::GDEW075T8:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x10);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _send8pixel(~value);
+      }
+      _writeCommand(0x92); // partial out
+      break;
+  }
+}
+
+void GxEPD2_32_BW::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  x -= x % 8; // byte boundary
+  w -= x % 8; // byte boundary
+  int16_t x1 = x < 0 ? 0 : x; // limit
+  int16_t y1 = y < 0 ? 0 : y; // limit
+  int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
+  int16_t h1 = y + h < HEIGHT ? h : HEIGHT - y; // limit
+  int16_t dx = x1 - x;
+  int16_t dy = y1 - y;
+  w1 -= dx;
+  h1 -= dy;
+  if ((w1 <= 0) || (h1 <= 0)) return;
+  switch (_panel)
+  {
+    case GxEPD2::GDEP015OC1:
+    case GxEPD2::GDE0213B1:
+    case GxEPD2::GDEH029A1:
+      _Init_Part(_ram_data_entry_mode);
+      _setRamEntryWindow(x1, y1, w1, h1, _ram_data_entry_mode);
+      break;
+    case GxEPD2::GDEW027W3:
+      _Init_Part(_ram_data_entry_mode);
+      _setPartialRamArea(x1, y1, w1, h1);
+      break;
+    case GxEPD2::GDEW042T2:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(x1, y1, w1, h1);
+      _writeCommand(0x13);
+      break;
+    case GxEPD2::GDEW075T8:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(x1, y1, w1, h1);
+      _writeCommand(0x10);
+      break;
+  }
+  for (int16_t i = 0; i < h1; i++)
+  {
+    for (int16_t j = 0; j < w1 / 8; j++)
+    {
+      uint8_t data;
+      // use w, h of bitmap for index!
+      int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+      if (pgm)
+      {
+#if defined(__AVR) || defined(ESP8266) || defined(ESP32)
+        data = pgm_read_byte(&bitmap[idx]);
+#else
+        data = bitmap[idx];
+#endif
+      }
+      else
+      {
+        data = bitmap[idx];
+      }
+      if (invert) data = ~data;
+      if (_panel == GxEPD2::GDEW075T8) _send8pixel(~data);
+      else _writeData(data);
+    }
+  }
+  switch (_panel)
+  {
+    case GxEPD2::GDEP015OC1:
+    case GxEPD2::GDE0213B1:
+    case GxEPD2::GDEH029A1:
+    case GxEPD2::GDEW027W3:
+      break;
+    case GxEPD2::GDEW042T2:
+    case GxEPD2::GDEW075T8:
+      _writeCommand(0x92); // partial out
+      break;
+  }
+}
+
+void GxEPD2_32_BW::writeImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  if (black)
+  {
+    writeImage(black, x, y, w, h, invert, mirror_y, pgm);
+  }
+}
+
+void GxEPD2_32_BW::drawImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  writeImage(bitmap, x, y, w, h, invert, mirror_y, pgm);
+  refresh(x, y, w, h);
+}
+
+void GxEPD2_32_BW::drawImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
+{
+  writeImage(black, red, x, y, w, h, invert, mirror_y, pgm);
+  refresh(x, y, w, h);
+}
+
+void GxEPD2_32_BW::refresh()
+{
+  refresh(0, 0, WIDTH, HEIGHT);
+}
+
+void GxEPD2_32_BW::refresh(int16_t x, int16_t y, int16_t w, int16_t h)
+{
+  x -= x % 8; // byte boundary
+  w -= x % 8; // byte boundary
+  int16_t x1 = x < 0 ? 0 : x; // limit
+  int16_t y1 = y < 0 ? 0 : y; // limit
+  int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
+  int16_t h1 = y + h < HEIGHT ? h : HEIGHT - y; // limit
+  w1 -= x1 - x;
+  h1 -= y1 - y;
+  switch (_panel)
+  {
+    case GxEPD2::GDEP015OC1:
+    case GxEPD2::GDE0213B1:
+    case GxEPD2::GDEH029A1:
+      _Init_Part(_ram_data_entry_mode);
+      _setRamEntryWindow(x1, y1, w1, h1, _ram_data_entry_mode);
+      _Update_Part();
+      break;
+    case GxEPD2::GDEW027W3:
+      _refreshWindow(x1, y1, w1, h1);
+      _waitWhileBusy("refresh");
+      break;
+    case GxEPD2::GDEW042T2:
+    case GxEPD2::GDEW075T8:
+      _Init_Part(_ram_data_entry_mode);
+      _writeCommand(0x91); // partial in
+      _setPartialRamArea(x1, y1, w1, h1);
+      _Update_Part();
+      break;
+  }
+}
+
 bool GxEPD2_32_BW::_nextPageFull()
 {
   uint16_t page_ys = _current_page * _page_height;
