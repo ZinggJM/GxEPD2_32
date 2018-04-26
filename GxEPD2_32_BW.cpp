@@ -280,13 +280,27 @@ void GxEPD2_32_BW::clearScreen(uint8_t value)
     case GxEPD2::GDEP015OC1:
     case GxEPD2::GDE0213B1:
     case GxEPD2::GDEH029A1:
-      _Init_Part(_ram_data_entry_mode);
-      _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
-      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      if (_initial)
       {
-        _writeData(value);
+        _Init_Full(_ram_data_entry_mode);
+        _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
+        for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+        {
+          _writeData(value);
+        }
+        _Update_Full();
       }
-      _Update_Part();
+      else
+      {
+        _Init_Part(_ram_data_entry_mode);
+        _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
+        for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+        {
+          _writeData(value);
+        }
+        _Update_Part();
+      }
+      _Init_Part(_ram_data_entry_mode);
       _setRamEntryWindow(0, 0, WIDTH, HEIGHT, _ram_data_entry_mode);
       for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
       {
@@ -378,6 +392,15 @@ void GxEPD2_32_BW::_writeScreenBuffer(uint8_t value)
       }
       break;
     case GxEPD2::GDEW027W3:
+      _Init_Part(_ram_data_entry_mode);
+      _setPartialRamArea(0, 0, WIDTH, HEIGHT);
+      _writeCommand(0x13);
+      for (int16_t i = 0; i < WIDTH * HEIGHT / 8; i++)
+      {
+        _writeData(value);
+      }
+      _Update_Part(); // needed!
+      break;
     case GxEPD2::GDEW042T2:
       _Init_Part(_ram_data_entry_mode);
       _writeCommand(0x91); // partial in
@@ -387,6 +410,7 @@ void GxEPD2_32_BW::_writeScreenBuffer(uint8_t value)
       {
         _writeData(value);
       }
+      _Update_Part(); // needed!
       _writeCommand(0x92); // partial out
       break;
     case GxEPD2::GDEW075T8:
@@ -499,9 +523,10 @@ void GxEPD2_32_BW::drawImage(const uint8_t* black, const uint8_t* red, int16_t x
   refresh(x, y, w, h);
 }
 
-void GxEPD2_32_BW::refresh()
+void GxEPD2_32_BW::refresh(bool partial_update_mode)
 {
-  refresh(0, 0, WIDTH, HEIGHT);
+  if (partial_update_mode) refresh(0, 0, WIDTH, HEIGHT);
+  else _Update_Full();
 }
 
 void GxEPD2_32_BW::refresh(int16_t x, int16_t y, int16_t w, int16_t h)

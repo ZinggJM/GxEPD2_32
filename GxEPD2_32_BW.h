@@ -59,7 +59,7 @@ class GxEPD2_32_BW : public Adafruit_GFX
     // write to controller memory, with screen refresh; x and w should be multiple of 8
     void drawImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
     void drawImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert = false, bool mirror_y = false, bool pgm = false);
-    void refresh(); // screen refresh from controller memory to full screen
+    void refresh(bool partial_update_mode = false); // screen refresh from controller memory to full screen
     void refresh(int16_t x, int16_t y, int16_t w, int16_t h); // screen refresh from controller memory, partial screen
   private:
     template <typename T> static inline void

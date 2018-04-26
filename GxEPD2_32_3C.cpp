@@ -632,9 +632,10 @@ void GxEPD2_32_3C::drawImage(const uint8_t* black, const uint8_t* red, int16_t x
   refresh(x, y, w, h);
 }
 
-void GxEPD2_32_3C::refresh()
+void GxEPD2_32_3C::refresh(bool partial_update_mode)
 {
-  refresh(0, 0, WIDTH, HEIGHT);
+  if (partial_update_mode) refresh(0, 0, WIDTH, HEIGHT);
+  else _Update_Full();
 }
 
 void GxEPD2_32_3C::refresh(int16_t x, int16_t y, int16_t w, int16_t h)
