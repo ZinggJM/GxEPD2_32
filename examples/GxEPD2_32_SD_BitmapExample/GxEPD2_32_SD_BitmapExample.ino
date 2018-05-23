@@ -251,13 +251,13 @@ void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
   file.close();
   if (valid)
   {
-    Serial.println("bitmap format not handled.");
-  }
-  else
-  {
     Serial.print("loaded in ");
     Serial.print(millis() - startTime);
     Serial.println(" ms");
+  }
+  else
+  {
+    Serial.println("bitmap format not handled.");
   }
 }
 
