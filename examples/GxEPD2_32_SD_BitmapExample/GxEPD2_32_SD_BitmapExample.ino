@@ -34,20 +34,32 @@
 // **** NOTE that the mapping suggestion may need modification depending on SD board used! ****
 // ********************************************************************************************
 //
-
-#define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
-#define EPD_CS D1 // alternative I use with RobotDyn Wemos D1 mini SD board
-
-#include <SPI.h>
-#include <SD.h>
+//#define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
+//#define EPD_CS D1 // alternative I use with RobotDyn Wemos D1 mini SD board
 
 #include <GxEPD2_32_BW.h>
 #include <GxEPD2_32_3C.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
+// include SdFat for FAT32 support with long filenames; available through Library Manager
+#include <SdFat.h>
+
+#if defined(SdFat_h)
+SdFat SD;
+#define FileClass SdFile
+#define position curPosition
+#define seek seekSet
+#else
+#include <SD.h>
+#define FileClass File
+#undef SdFat_h
+#endif
+
 #if defined (ESP8266)
+#define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
+#define EPD_CS D1 // alternative I use with RobotDyn Wemos D1 mini SD board
 // select one and adapt to your mapping
-GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
@@ -63,6 +75,8 @@ GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4
 #endif
 
 #if defined(ESP32)
+#define SD_CS 0  // adapt to your wiring
+#define EPD_CS SS // adapt to your wiring
 // select one and adapt to your mapping
 //GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
@@ -80,6 +94,8 @@ GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4
 #endif
 
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
+#define SD_CS 0  // adapt to your wiring
+#define EPD_CS SS // adapt to your wiring
 // select one and adapt to your mapping
 //GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
@@ -113,9 +129,32 @@ void setup(void)
   Serial.println("SD OK!");
 
   drawBitmapFromSD("parrot.bmp", 0, 0);
-  delay(5000);
+  delay(2000);
   drawBitmapFromSD("betty_1.bmp", 0, 0);
-  delay(5000);
+  delay(2000);
+#if defined(SdFat_h)
+  drawBitmapFromSD("logo200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("first200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("second200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("third200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("fourth200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("fifth200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("sixth200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("senventh200x200.bmp", 0, 0);
+  delay(2000);
+  drawBitmapFromSD("eighth200x200.bmp", 0, 0);
+  delay(2000);
+#else
+  drawBitmapFromSD("logo.bmp", 0, 0);
+  delay(2000);
+#endif
 }
 
 void loop()
@@ -126,7 +165,7 @@ void loop()
 
 void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
 {
-  File file;
+  FileClass file;
   uint8_t buffer[3 * SD_BUFFER_PIXELS]; // pixel buffer, size for r,g,b
   bool valid = false; // valid format to be handled
   bool flip = true; // bitmap is stored bottom-to-top
@@ -137,12 +176,20 @@ void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
   Serial.print("Loading image '");
   Serial.print(filename);
   Serial.println('\'');
+#if defined(SdFat_h)
+  if (!file.open(filename, FILE_READ))
+  {
+    Serial.print("File not found");
+    return;
+  }
+#else
   file = SD.open(filename);
   if (!file)
   {
     Serial.print("File not found");
     return;
   }
+#endif
   // Parse BMP header
   if (read16(file) == 0x4D42) // BMP signature
   {
@@ -261,7 +308,7 @@ void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
   }
 }
 
-uint16_t read16(File f)
+uint16_t read16(FileClass& f)
 {
   // BMP data is stored little-endian, same as Arduino.
   uint16_t result;
@@ -270,7 +317,7 @@ uint16_t read16(File f)
   return result;
 }
 
-uint32_t read32(File f)
+uint32_t read32(FileClass& f)
 {
   // BMP data is stored little-endian, same as Arduino.
   uint32_t result;
@@ -280,5 +327,4 @@ uint32_t read32(File f)
   ((uint8_t *)&result)[3] = f.read(); // MSB
   return result;
 }
-
 
