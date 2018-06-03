@@ -1,15 +1,13 @@
-// GxEPD2_32_SD_BitmapExample : test example for e-Paper displays from Waveshare and from Dalian Good Display Inc.
+// GxEPD2_32_Spiffs_Example : Display Library example for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
+// Requires HW SPI and Adafruit_GFX. Caution: these e-papers require 3.3V supply AND data lines!
 //
-// Created by Jean-Marc Zingg based on demo code from Good Display,
-// available on http://www.good-display.com/download_list/downloadcategoryid=34&isMode=false.html
+// Display Library based on Demo Example from Good Display: http://www.good-display.com/download_list/downloadcategoryid=34&isMode=false.html
 //
-// The e-paper displays are available from:
+// Author: Jean-Marc Zingg
 //
-// https://www.aliexpress.com/store/product/Wholesale-1-54inch-E-Ink-display-module-with-embedded-controller-200x200-Communicate-via-SPI-interface-Supports/216233_32824535312.html
+// Version: see library.properties
 //
-// http://www.buy-lcd.com/index.php?route=product/product&path=2897_8363&product_id=35120
-// or https://www.aliexpress.com/store/product/E001-1-54-inch-partial-refresh-Small-size-dot-matrix-e-paper-display/600281_32815089163.html
-//
+// Library: https://github.com/ZinggJM/GxEPD2_32
 
 // Supporting Arduino Forum Topics:
 // Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
@@ -21,6 +19,9 @@
 // mapping suggestion from Waveshare SPI e-Paper to generic ESP8266
 // BUSY -> GPIO4, RST -> GPIO2, DC -> GPIO0, CS -> GPIO15, CLK -> GPIO14, DIN -> GPIO13, GND -> GND, 3.3V -> 3.3V
 
+// mapping of Waveshare e-Paper ESP8266 Driver Board
+// BUSY -> GPIO16, RST -> GPIO5, DC -> GPIO4, CS -> GPIO15, CLK -> GPIO14, DIN -> GPIO13, GND -> GND, 3.3V -> 3.3V
+
 // mapping suggestion for ESP32, e.g. LOLIN32, see .../variants/.../pins_arduino.h for your board
 // NOTE: there are variants with different pins for SPI ! CHECK SPI PINS OF YOUR BOARD
 // BUSY -> 4, RST -> 16, DC -> 17, CS -> SS(5), CLK -> SCK(18), DIN -> MOSI(23), GND -> GND, 3.3V -> 3.3V
@@ -31,142 +32,107 @@
 // mapping suggestion for AVR, UNO, NANO etc.
 // BUSY -> 7, RST -> 9, DC -> 8, CS-> 10, CLK -> 13, DIN -> 11
 //
-// **** NOTE that the mapping suggestion may need modification depending on SD board used! ****
-// ********************************************************************************************
-//
-//#define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
-//#define EPD_CS D1 // alternative I use with RobotDyn Wemos D1 mini SD board
 
 #include <GxEPD2_32_BW.h>
 #include <GxEPD2_32_3C.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
-// include SdFat for FAT32 support with long filenames; available through Library Manager
-#include <SdFat.h>
-
-#if defined(SdFat_h)
-SdFat SD;
-#define FileClass SdFile
-#define position curPosition
-#define seek seekSet
-#else
-#include <SD.h>
-#define FileClass File
-#undef SdFat_h
-#endif
+#include <FS.h>
+#define FileClass fs::File
 
 #if defined (ESP8266)
-#define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
-#define EPD_CS D1 // alternative I use with RobotDyn Wemos D1 mini SD board
 // select one and adapt to your mapping
-//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW075T8,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 #endif
 
 #if defined(ESP32)
-#define SD_CS 0  // adapt to your wiring
-#define EPD_CS SS // adapt to your wiring
 // select one and adapt to your mapping
-//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
-//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 #endif
 
 #if defined(_BOARD_GENERIC_STM32F103C_H_)
-#define SD_CS 0  // adapt to your wiring
-#define EPD_CS SS // adapt to your wiring
 // select one and adapt to your mapping
-//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDE0213B1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEH029A1, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW027W3, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
-//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=4*/ EPD_CS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+//GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 #endif
 
-void setup(void)
+void setup()
 {
   Serial.begin(115200);
   Serial.println();
-  Serial.println("setup");
+  Serial.println("GxEPD2_32_Spiffs_Example");
 
   display.init();
 
-  Serial.print("Initializing SD card...");
-  if (!SD.begin(SD_CS))
-  {
-    Serial.println("SD failed!");
-    return;
-  }
-  Serial.println("SD OK!");
+  SPIFFS.begin();
+  Serial.println("SPIFFS started");
+  listFiles();
 
-  drawBitmapFromSD("parrot.bmp", 0, 0);
+  drawBitmapFromSpiffs("chanceflurries.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("betty_1.bmp", 0, 0);
+  drawBitmapFromSpiffs("logo200x200.bmp", 0, 0);
   delay(2000);
-#if defined(SdFat_h)
-  drawBitmapFromSD("logo200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("first200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("first200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("second200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("second200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("third200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("third200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("fourth200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("fourth200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("fifth200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("fifth200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("sixth200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("sixth200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("seventh200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("seventh200x200.bmp", 0, 0);
+  drawBitmapFromSpiffs("eighth200x200.bmp", 0, 0);
   delay(2000);
-  drawBitmapFromSD("eighth200x200.bmp", 0, 0);
-  delay(2000);
-#else
-  drawBitmapFromSD("logo.bmp", 0, 0);
-  delay(2000);
-#endif
 }
 
-void loop()
+void loop(void)
 {
 }
 
-#define SD_BUFFER_PIXELS 20
-
-void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
+void drawBitmapFromSpiffs(const char *filename, uint8_t x, uint8_t y)
 {
   FileClass file;
-  uint8_t buffer[3 * SD_BUFFER_PIXELS]; // pixel buffer, size for r,g,b
+  uint8_t buffer[512]; // buffer for at least one row
   bool valid = false; // valid format to be handled
   bool flip = true; // bitmap is stored bottom-to-top
   uint32_t pos = 0;
@@ -176,20 +142,12 @@ void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
   Serial.print("Loading image '");
   Serial.print(filename);
   Serial.println('\'');
-#if defined(SdFat_h)
-  if (!file.open(filename, FILE_READ))
-  {
-    Serial.print("File not found");
-    return;
-  }
-#else
-  file = SD.open(filename);
+  file = SPIFFS.open(filename, "r");
   if (!file)
   {
     Serial.print("File not found");
     return;
   }
-#endif
   // Parse BMP header
   if (read16(file) == 0x4D42) // BMP signature
   {
@@ -295,6 +253,7 @@ void drawBitmapFromSD(const char *filename, uint8_t x, uint8_t y)
       }
     }
   }
+  //Serial.print("end position  "); Serial.println(file.position());
   file.close();
   if (valid)
   {

@@ -20,9 +20,13 @@ Simplified Version of GxEPD for 32 Bit Arduino
 - Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
 - Good Dispay ePaper for Arduino : https://forum.arduino.cc/index.php?topic=436411.0
 
-### Version 1.0.6
+### Version 1.0.7
+- added GxEPD2_32_Spiffs_Example
+- added GxEPD2_32_Spiffs_Loader
+- added GxEPD2_32_WiFi_Example
+#### Version 1.0.6
 - added GxEPD2_32_SD_BitmapExample
-### Version 1.0.5
+#### Version 1.0.5
 - update and fix for additions of version 1.04
 #### Version 1.0.4
 - Support for Bitmaps (Sprites) to Controller Buffer and to Screen
