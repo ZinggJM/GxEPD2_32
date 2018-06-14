@@ -17,10 +17,10 @@
 class GxEPD2_32_3C : public Adafruit_GFX
 {
   private:
-    // 2 * ~5k full screen buffer for GDEW042Z15 is optimal (black/white + color/white)
-    static const uint16_t buffer_size = 400 * 300 / 8; // 2 * 5'000 bytes
-    // 2 * ~2.5k half screen buffer for GDEW042Z15 is a good compromise
-    // static const uint16_t buffer_size = 400 * 300 / 8 / 2; // 2 * 2'500 bytes
+    // 2 * ~15k full screen buffer for GDEW042Z15 is optimal (black/white + color/white)
+    static const uint16_t buffer_size = 400 * 300 / 8; // 2 * 15'000 bytes
+    // 2 * ~7.5k half screen buffer for GDEW042Z15 is a good compromise
+    // static const uint16_t buffer_size = 400 * 300 / 8 / 2; // 2 * 7'500 bytes
   public:
     GxEPD2_32_3C(GxEPD2::Panel panel, int8_t cs, int8_t dc, int8_t rst, int8_t busy);
     void drawPixel(int16_t x, int16_t y, uint16_t color);

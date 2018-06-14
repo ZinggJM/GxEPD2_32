@@ -17,8 +17,8 @@
 class GxEPD2_32_BW : public Adafruit_GFX
 {
   private:
-    // ~5k full screen buffer for GDEW042T2 is a good compromise
-    static const uint16_t buffer_size = 400 * 300 / 8; // 5'000 bytes
+    // ~15k full screen buffer for GDEW042T2 is a good compromise
+    static const uint16_t buffer_size = 400 * 300 / 8; // 15'000 bytes
     // 30k full screen buffer for GDEW075T8 will nearly fill ESP8266
     //static const uint16_t buffer_size = 640 * 384 / 8; // 30'720 bytes
   public:
