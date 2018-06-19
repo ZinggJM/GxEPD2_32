@@ -43,10 +43,22 @@
 #include <GxEPD2_32_3C.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
+#if defined(ESP32)
+
+// has support for FAT32 support with long filenames
+#include "FS.h"
+#include "SD.h"
+#include "SPI.h"
+#define SdFile File
+#define seekSet seek
+
+#else
+
 // include SdFat for FAT32 support with long filenames; available through Library Manager
 #include <SdFat.h>
-
 SdFat SD;
+
+#endif
 
 #if defined (ESP8266)
 #define SD_CS SS  // e.g. for RobotDyn Wemos D1 mini SD board
@@ -63,12 +75,12 @@ SdFat SD;
 //GxEPD2_32_3C display(GxEPD2::GDEW0213Z16,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
-GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+//GxEPD2_32_3C display(GxEPD2::GDEW042Z15,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=D8*/ EPD_CS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 #endif
 
 #if defined(ESP32)
-#define SD_CS 0  // adapt to your wiring
+#define SD_CS 2  // adapt to your wiring
 #define EPD_CS SS // adapt to your wiring
 // select one and adapt to your mapping
 //GxEPD2_32_BW display(GxEPD2::GDEP015OC1, /*CS=5*/ EPD_CS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
@@ -150,7 +162,7 @@ void drawBitmaps_200x200()
   delay(2000);
   drawBitmapFromSD("sixth200x200.bmp", x, y);
   delay(2000);
-  drawBitmapFromSD("senventh200x200.bmp", x, y);
+  drawBitmapFromSD("seventh200x200.bmp", x, y);
   delay(2000);
   drawBitmapFromSD("eighth200x200.bmp", x, y);
   delay(2000);
@@ -210,11 +222,20 @@ void drawBitmapFromSD(const char *filename, int16_t x, int16_t y, bool with_colo
   Serial.print("Loading image '");
   Serial.print(filename);
   Serial.println('\'');
+#if defined(ESP32)
+  file = SD.open(String("/") + filename, FILE_READ);
+  if (!file)
+  {
+    Serial.print("File not found");
+    return;
+  }
+#else
   if (!file.open(filename, FILE_READ))
   {
     Serial.print("File not found");
     return;
   }
+#endif
   // Parse BMP header
   if (read16(file) == 0x4D42) // BMP signature
   {
@@ -374,8 +395,8 @@ void drawBitmapFromSD(const char *filename, int16_t x, int16_t y, bool with_colo
   //Serial.print("end curPosition  "); Serial.println(file.curPosition());
   file.close();
   if (!valid)
-  {
-    Serial.println("bitmap format not handled.");
+{
+  Serial.println("bitmap format not handled.");
   }
 }
 

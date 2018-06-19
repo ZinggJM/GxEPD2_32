@@ -89,7 +89,10 @@
 //GxEPD2_32_3C display(GxEPD2::GDEW075Z09,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 #endif
 
+#if defined (ESP8266)
 #include <ESP8266WiFi.h>
+#endif
+
 #include <WiFiClient.h>
 #include <WiFiClientSecure.h>
 
@@ -115,7 +118,7 @@ void setup()
 
   display.init();
 
-#ifdef RE_INIT_NEEDED
+#if defined(RE_INIT_NEEDED)
   WiFi.persistent(true);
   WiFi.mode(WIFI_STA); // switch off AP
   WiFi.setAutoConnect(true);
@@ -188,6 +191,8 @@ void drawBitmaps_200x200()
 
 // note: long downloads do not work with ESP8266, needs further investigation
 
+#if defined(ESP8266)
+
 void drawBitmaps_other()
 {
   int16_t w2 = display.width() / 2;
@@ -217,6 +222,40 @@ void drawBitmaps_other()
   //showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "woof.bmp", fp_rawcontent, w2 - 100, h2 - 100);
   //delay(2000);
 }
+
+#else
+
+void drawBitmaps_other()
+{
+  int16_t w2 = display.width() / 2;
+  int16_t h2 = display.height() / 2;
+  showBitmapFrom_HTTP("www.squix.org", "/blog/wunderground/", "chanceflurries.bmp", w2 - 50, h2 - 50, false);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "betty_1.bmp", fp_rawcontent, w2 - 100, h2 - 160);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "betty_4.bmp", fp_rawcontent, w2 - 102, h2 - 126);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "marilyn_240x240x8.bmp", fp_rawcontent, w2 - 120, h2 - 120);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "miniwoof.bmp", fp_rawcontent, w2 - 60, h2 - 80);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "test.bmp", fp_rawcontent, w2 - 100, h2 - 100);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "tiger.bmp", fp_rawcontent, w2 - 160, h2 - 120);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "tiger_178x160x4.bmp", fp_rawcontent, w2 - 89, h2 - 80);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "tiger_240x317x4.bmp", fp_rawcontent, w2 - 120, h2 - 160);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "tiger_320x200x24.bmp", fp_rawcontent, w2 - 160, h2 - 100);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "tiger16T.bmp", fp_rawcontent, w2 - 160, h2 - 100);
+  delay(2000);
+  showBitmapFrom_HTTPS(host_rawcontent, path_prenticedavid, "woof.bmp", fp_rawcontent, w2 - 100, h2 - 100);
+  delay(2000);
+}
+
+#endif
 
 static const uint16_t input_buffer_pixels = 640; // may affect performance
 
@@ -479,6 +518,7 @@ void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filena
     Serial.println("connection failed");
     return;
   }
+#if defined (ESP8266)
   if (fingerprint)
   {
     if (client.verify(fingerprint, host))
@@ -491,6 +531,7 @@ void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filena
       return;
     }
   }
+#endif
   Serial.print("requesting URL: ");
   Serial.println(String("https://") + host + path + filename);
   client.print(String("GET ") + path + filename + " HTTP/1.1\r\n" +
@@ -641,15 +682,15 @@ void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filena
                   uint8_t msb = input_buffer[in_idx++];
                   if (format == 0) // 555
                   {
-                    blue  = (lsb & 0x1F);
-                    green = ((msb & 0x03) << 3) | ((lsb & 0xE0) >> 5);
-                    red   = (msb & 0x7C) >> 2;
+                    blue  = (lsb & 0x1F) << 3;
+                    green = ((msb & 0x03) << 6) | ((lsb & 0xE0) >> 2);
+                    red   = (msb & 0x7C) << 1;
                   }
                   else // 565
                   {
-                    blue  = (lsb & 0x1F);
-                    green = ((msb & 0x07) << 3) | ((lsb & 0xE0) >> 5);
-                    red   = (msb & 0xF8) >> 3;
+                    blue  = (lsb & 0x1F) << 3;
+                    green = ((msb & 0x07) << 5) | ((lsb & 0xE0) >> 3);
+                    red   = (msb & 0xF8);
                   }
                   whitish = with_color ? ((red > 0x80) && (green > 0x80) && (blue > 0x80)) : ((red + green + blue) > 3 * 0x80); // whitish
                   colored = (red > 0xF0) || ((green > 0xF0) && (blue > 0xF0)); // reddish or yellowish?
