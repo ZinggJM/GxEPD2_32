@@ -51,7 +51,7 @@
 //GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDEW075T8,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
+// !!! can't be used for this //GxEPD2_32_3C display(GxEPD2::GDEW0154Z04,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW0213Z16,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=D8*/ SS, /*DC=D3*/ 0, /*RST=D4*/ 2, /*BUSY=D2*/ 4);
@@ -68,7 +68,7 @@
 //GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
+// !!! can't be used for this //GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=5*/ SS, /*DC=*/ 17, /*RST=*/ 16, /*BUSY=*/ 4);
@@ -85,7 +85,7 @@
 //GxEPD2_32_BW display(GxEPD2::GDEW042T2, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_BW display(GxEPD2::GDEW075T8, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 // 3-color e-papers
-//GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
+// !!! can't be used for this //GxEPD2_32_3C display(GxEPD2::GDEW0154Z04, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_3C display(GxEPD2::GDEW0213Z16, /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_3C display(GxEPD2::GDEW029Z10,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
 //GxEPD2_32_3C display(GxEPD2::GDEW027C44,  /*CS=4*/ SS, /*DC=*/ 3, /*RST=*/ 2, /*BUSY=*/ 1);
@@ -134,7 +134,7 @@ void drawBitmaps_200x200()
   delay(2000);
   drawBitmapFromSpiffs("sixth200x200.bmp", x, y);
   delay(2000);
-  drawBitmapFromSpiffs("senventh200x200.bmp", x, y);
+  drawBitmapFromSpiffs("seventh200x200.bmp", x, y);
   delay(2000);
   drawBitmapFromSpiffs("eighth200x200.bmp", x, y);
   delay(2000);
@@ -218,6 +218,7 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
       Serial.println(height);
       // BMP rows are padded (if needed) to 4-byte boundary
       uint32_t rowSize = (width * depth / 8 + 3) & ~3;
+      if (depth < 8) rowSize = ((width * depth + 8 - depth) / 8 + 3) & ~3;
       if (height < 0)
       {
         height = -height;
@@ -227,7 +228,7 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
       uint16_t h = height;
       if ((x + w - 1) >= display.width())  w = display.width()  - x;
       if ((y + h - 1) >= display.height()) h = display.height() - y;
-      if (w < max_row_width) // handle with direct drawing
+      if (w <= max_row_width) // handle with direct drawing
       {
         valid = true;
         uint8_t bitmask = 0xFF;
@@ -253,7 +254,7 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
             color_palette_buffer[pn / 8] |= colored << pn % 8;
           }
         }
-        display.writeScreenBuffer();
+        display.clearScreen();
         uint32_t rowPosition = flip ? imageOffset + (height - h) * rowSize : imageOffset;
         for (uint16_t row = 0; row < h; row++, rowPosition += rowSize) // for each line
         {
@@ -262,8 +263,8 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
           uint32_t in_bytes = 0;
           uint8_t in_byte = 0; // for depth <= 8
           uint8_t in_bits = 0; // for depth <= 8
-          uint8_t out_byte = 0;
-          uint8_t out_color_byte = 0;
+          uint8_t out_byte = 0xFF; // white (for w%8!=0 boarder)
+          uint8_t out_color_byte = 0xFF; // white (for w%8!=0 boarder)
           uint32_t out_idx = 0;
           file.seek(rowPosition);
           for (uint16_t col = 0; col < w; col++) // for each pixel
@@ -323,23 +324,22 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
             }
             if (whitish)
             {
-              out_byte |= 0x80 >> col % 8; // not black
-              out_color_byte |= 0x80 >> col % 8; // not colored
+              // keep white
             }
             else if (colored && with_color)
             {
-              out_byte |= 0x80 >> col % 8; // not black
+              out_color_byte &= ~(0x80 >> col % 8); // colored
             }
             else
             {
-              out_color_byte |= 0x80 >> col % 8; // not colored
+              out_byte &= ~(0x80 >> col % 8); // black
             }
-            if (7 == col % 8)
+            if ((7 == col % 8) || (col == w - 1)) // write that last byte! (for w%8!=0 boarder)
             {
               output_row_color_buffer[out_idx] = out_color_byte;
               output_row_mono_buffer[out_idx++] = out_byte;
-              out_byte = 0;
-              out_color_byte = 0;
+              out_byte = 0xFF; // white (for w%8!=0 boarder)
+              out_color_byte = 0xFF; // white (for w%8!=0 boarder)
             }
           } // end pixel
           uint16_t yrow = y + (flip ? h - row - 1 : row);

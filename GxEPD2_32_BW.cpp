@@ -429,8 +429,9 @@ void GxEPD2_32_BW::_writeScreenBuffer(uint8_t value)
 
 void GxEPD2_32_BW::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
 {
+  int16_t wb = (w + 7) / 8; // width bytes, bitmaps are padded
   x -= x % 8; // byte boundary
-  w -= x % 8; // byte boundary
+  w = wb * 8; // byte boundary
   int16_t x1 = x < 0 ? 0 : x; // limit
   int16_t y1 = y < 0 ? 0 : y; // limit
   int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
@@ -470,8 +471,8 @@ void GxEPD2_32_BW::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int1
     for (int16_t j = 0; j < w1 / 8; j++)
     {
       uint8_t data;
-      // use w, h of bitmap for index!
-      int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * (w / 8) : j + dx / 8 + (i + dy) * (w / 8);
+      // use wb, h of bitmap for index!
+      int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * wb : j + dx / 8 + (i + dy) * wb;
       if (pgm)
       {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)

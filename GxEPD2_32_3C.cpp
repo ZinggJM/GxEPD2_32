@@ -404,8 +404,9 @@ void GxEPD2_32_3C::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int1
 
 void GxEPD2_32_3C::writeImage(const uint8_t* black, const uint8_t* red, int16_t x, int16_t y, int16_t w, int16_t h, bool invert, bool mirror_y, bool pgm)
 {
+  int16_t wb = (w + 7) / 8; // width bytes, bitmaps are padded
   x -= x % 8; // byte boundary
-  w -= x % 8; // byte boundary
+  w = wb * 8; // byte boundary
   int16_t x1 = x < 0 ? 0 : x; // limit
   int16_t y1 = y < 0 ? 0 : y; // limit
   int16_t w1 = x + w < WIDTH ? w : WIDTH - x; // limit
@@ -427,11 +428,10 @@ void GxEPD2_32_3C::writeImage(const uint8_t* black, const uint8_t* red, int16_t 
           uint8_t data = 0xFF;
           if (black)
           {
-            // use w, h of bitmap for index!
-            //if ((i + dy < h) && (j + dx < w))
+            // use wb, h of bitmap for index!
             if (((x + j) >= 0) && ((x + j) < w) && ((y + i) >= 0) && ((y + i) < h))
             {
-              int16_t idx = mirror_y ? (x + j) / 8 + ((h - 1 - (y + i))) * (w / 8) : (x + j) / 8 + (y + i) * (w / 8);
+              int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * wb : j + dx / 8 + (i + dy) * wb;
               if (pgm)
               {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
@@ -460,11 +460,10 @@ void GxEPD2_32_3C::writeImage(const uint8_t* black, const uint8_t* red, int16_t 
           uint8_t data = 0xFF;
           if (red)
           {
-            // use w, h of bitmap for index!
-            //if ((i + dy < h) && (j + dx < w))
+            // use wb, h of bitmap for index!
             if (((x + j) >= 0) && ((x + j) < w) && ((y + i) >= 0) && ((y + i) < h))
             {
-              int16_t idx = mirror_y ? (x + j) / 8 + ((h - 1 - (y + i))) * (w / 8) : (x + j) / 8 + (y + i) * (w / 8);
+              int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * wb : j + dx / 8 + (i + dy) * wb;
               if (pgm)
               {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
