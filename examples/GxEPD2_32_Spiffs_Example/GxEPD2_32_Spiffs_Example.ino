@@ -39,6 +39,10 @@
 #include <GxEPD2_32_3C.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
+#if defined(ESP32)
+#include "SPIFFS.h"
+#endif
+
 #include <FS.h>
 #define FileClass fs::File
 
@@ -188,7 +192,11 @@ void drawBitmapFromSpiffs(const char *filename, int16_t x, int16_t y, bool with_
   Serial.print("Loading image '");
   Serial.print(filename);
   Serial.println('\'');
+#if defined(ESP32)
+  file = SPIFFS.open(String("/") + filename, "r");
+#else
   file = SPIFFS.open(filename, "r");
+#endif
   if (!file)
   {
     Serial.print("File not found");

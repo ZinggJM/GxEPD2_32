@@ -13,6 +13,12 @@
 // Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
 // Good Dispay ePaper for Arduino : https://forum.arduino.cc/index.php?topic=436411.0
 
+#if defined(ESP32)
+#include "SPIFFS.h"
+// set formatOnFail = true for initial format of ESP32 SPIFFS (e.g. if error occured)
+const bool formatOnFail = false;
+#endif
+
 #include <FS.h>
 
 #if defined (ESP8266)
@@ -78,7 +84,11 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
+#if defined(ESP32)
+  SPIFFS.begin(formatOnFail);
+#else
   SPIFFS.begin();
+#endif
   Serial.println("SPIFFS started");
   listFiles();
   //deleteFiles();
@@ -182,10 +192,16 @@ void downloadFile_HTTP(const char* host, const char* path, const char* filename,
   }
   if (!ok) return;
   uint8_t buffer[512];
+#if defined(ESP8266)
   client.peekBytes(buffer, 2);
   Serial.write(buffer[0]); Serial.write(buffer[1]); Serial.println();
+#endif
   size_t total = 0;
+#if defined(ESP32)
+  fs::File file = SPIFFS.open(String("/") + target, "w+");
+#else
   fs::File file = SPIFFS.open(target, "w+");
+#endif
   if (!file)
   {
     Serial.print(target); Serial.println(" open failed");
@@ -218,6 +234,7 @@ void downloadFile_HTTPS(const char* host, const char* path, const char* filename
     Serial.println("connection failed");
     return;
   }
+#if defined (ESP8266)
   if (fingerprint)
   {
     if (client.verify(fingerprint, host))
@@ -230,6 +247,7 @@ void downloadFile_HTTPS(const char* host, const char* path, const char* filename
       return;
     }
   }
+#endif
   Serial.print("requesting URL: ");
   Serial.println(String("https://") + host + path + filename);
   client.print(String("GET ") + path + filename + " HTTP/1.1\r\n" +
@@ -257,10 +275,16 @@ void downloadFile_HTTPS(const char* host, const char* path, const char* filename
   }
   if (!ok) return;
   uint8_t buffer[512];
+#if defined(ESP8266)
   client.peekBytes(buffer, 2);
   Serial.write(buffer[0]); Serial.write(buffer[1]); Serial.println();
+#endif
   size_t total = 0;
+#if defined(ESP32)
+  fs::File file = SPIFFS.open(String("/") + target, "w+");
+#else
   fs::File file = SPIFFS.open(target, "w+");
+#endif
   if (!file)
   {
     Serial.print(target); Serial.println(" open failed");
