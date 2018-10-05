@@ -15,6 +15,9 @@
 // see: https://github.com/olikraus/U8g2_for_Adafruit_GFX/blob/master/README.md
 //
 // This version uses the U8G2_FONTS_GFX addition for newline support (issue #5)
+//
+// NOTE: you need to SAVE the modified example to a saveable location for UTF-8 characters to work
+//       e.g. for Umlauts
 
 // Supporting Arduino Forum Topics:
 // Waveshare e-paper displays with SPI: http://forum.arduino.cc/index.php?topic=487007.0
